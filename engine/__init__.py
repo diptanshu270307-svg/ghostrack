@@ -1,0 +1,1 @@
+"""Geometric Contradiction Engine package."""

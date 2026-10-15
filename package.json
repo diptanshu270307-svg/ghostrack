@@ -1,0 +1,23 @@
+{
+  "name": "ghosttrack",
+  "version": "1.0.0",
+  "description": "InSight AI / GhostTrack: Resilient Indoor Positioning via Geometric Outlier Rejection and Predictive Dead-Reckoning",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "dev:backend": "python -m uvicorn backend.main:app --reload --port 8000",
+    "dev:sim": "python -m simulator.sim",
+    "test": "pytest tests/ -v"
+  },
+  "keywords": [
+    "indoor-positioning",
+    "uwb",
+    "ble",
+    "geometric-outlier-rejection",
+    "dead-reckoning",
+    "lstm",
+    "sensor-fusion"
+  ],
+  "author": "InSight AI Team",
+  "license": "MIT"
+}
