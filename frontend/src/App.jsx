@@ -406,7 +406,45 @@ export default function App() {
       );
     });
 
-    // 8. Render Ground Truth Marker & Fixed-Size Target Marker with Defined Confidence Callout (USP #03)
+    // 8. Render Simultaneous Peer Targets & Primary Target Marker with Defined Confidence Callout (USP #03)
+    const peerTargets = frame?.peer_targets || [];
+    const primaryId = frame?.target_id || 'target_alpha';
+
+    // Draw non-primary peer targets first so primary target stays on top
+    peerTargets.forEach((pt) => {
+      if (pt.target_id === primaryId) return;
+      const gtx = toPxX(pt.gt_x);
+      const gty = toPxY(pt.gt_y);
+      ctx.beginPath();
+      ctx.arc(gtx, gty, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.fill();
+
+      const px = toPxX(pt.x);
+      const py = toPxY(pt.y);
+      ctx.beginPath();
+      ctx.arc(px, py, 7.5, 0, Math.PI * 2);
+      ctx.fillStyle = pt.color || '#38bdf8';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      const peerPct = Math.round((pt.confidence_within_2m || 0.85) * 100);
+      const peerLabel = `${pt.label} · ${pt.state} (${peerPct}%)`;
+      ctx.font = '700 11px sans-serif';
+      const tw = ctx.measureText(peerLabel).width;
+      const bx = Math.min(W - tw - 16, px + 12);
+      const by = Math.max(22, py - 10);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.84)';
+      ctx.fillRect(bx - 4, by - 13, tw + 8, 18);
+      ctx.strokeStyle = pt.color || '#38bdf8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bx - 4, by - 13, tw + 8, 18);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(peerLabel, bx, by);
+    });
+
     if (frame && frame.ground_truth) {
       const gx = toPxX(frame.ground_truth.x);
       const gy = toPxY(frame.ground_truth.y);
@@ -419,9 +457,11 @@ export default function App() {
     if (frame) {
       const tx = toPxX(frame.x);
       const ty = toPxY(frame.y);
+      const primaryPeer = peerTargets.find((p) => p.target_id === primaryId);
+      const primaryName = primaryPeer ? `${primaryPeer.label}: ` : '';
 
       ctx.beginPath();
-      ctx.arc(tx, ty, 8, 0, Math.PI * 2);
+      ctx.arc(tx, ty, 8.5, 0, Math.PI * 2);
       ctx.fillStyle =
         frame.state === 'Ghost'
           ? '#c084fc'
@@ -436,7 +476,7 @@ export default function App() {
       ctx.stroke();
 
       const confPct = Math.round((frame.confidence_within_2m || 0.85) * 100);
-      const calloutText = `${confPct}% within 2m (σ=${frame.sigma.toFixed(2)}m)`;
+      const calloutText = `${primaryName}${confPct}% within 2m (σ=${frame.sigma.toFixed(2)}m)`;
       ctx.font = '700 12px sans-serif';
       const textW = ctx.measureText(calloutText).width;
       const boxX = Math.min(W - textW - 18, tx + 14);
@@ -577,6 +617,12 @@ export default function App() {
           <div className={`state-badge state-${currentState}`}>
             STATE: {currentState}
             {frame && !frame.recovery_verified ? ' (VERIFYING FIX)' : ''}
+          </div>
+          <div className="metric-chip">
+            Active Targets:{' '}
+            <strong>
+              {frame?.active_targets_count || 1} in room
+            </strong>
           </div>
           <div className="metric-chip">
             Anchors Online:{' '}
@@ -799,6 +845,55 @@ export default function App() {
               >
                 ▶ Run Scripted Chaos Scenario
               </button>
+            </div>
+
+            <div className="control-group">
+              <div className="control-label">
+                <span>Simultaneous Multi-Person Tracking in Same Room:</span>
+                <span className="val">{frame?.active_targets_count || 1} Active</span>
+              </div>
+              <div className="btn-row">
+                {[1, 2, 3].map((cnt) => (
+                  <button
+                    key={cnt}
+                    className={(frame?.active_targets_count || 1) === cnt ? 'active-mode' : ''}
+                    onClick={() => sendCommand({ command: 'set_target_count', count: cnt })}
+                  >
+                    {cnt === 1 ? '👤 1 Person' : cnt === 2 ? '👥 2 People Simultaneously' : '👥👤 3 People Simultaneously'}
+                  </button>
+                ))}
+              </div>
+              {(frame?.peer_targets || []).length > 1 && (
+                <div className="btn-row" style={{ marginTop: '6px' }}>
+                  <span style={{ fontSize: '0.74rem', color: '#94a3b8', alignSelf: 'center' }}>
+                    Focus Heatmap &amp; Diagnostics on:
+                  </span>
+                  {(frame?.peer_targets || []).map((pt) => (
+                    <button
+                      key={pt.target_id}
+                      className={frame?.target_id === pt.target_id ? 'active-mode' : ''}
+                      onClick={() => {
+                        gtTrailRef.current = [];
+                        estTrailRef.current = [];
+                        naiveTrailRef.current = [];
+                        sendCommand({ command: 'select_target', target_id: pt.target_id });
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: pt.color,
+                          marginRight: '5px',
+                        }}
+                      />
+                      {pt.label} ({pt.state})
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="control-group">

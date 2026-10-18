@@ -50,3 +50,20 @@ def test_pipeline_service_all_12_usps_and_controls():
     msg_rec = svc.tick()
     assert msg_rec.anchors_online == 4
     assert len(msg_rec.audit_events) > 0
+
+    # Test simultaneous multi-person tracking (3 people in the same room)
+    svc.apply_control_command({"command": "set_target_count", "count": 3})
+    msg_multi = svc.tick()
+    assert msg_multi.active_targets_count == 3
+    assert len(msg_multi.peer_targets) == 3
+    assert {p.target_id for p in msg_multi.peer_targets} == {
+        "target_alpha",
+        "target_bravo",
+        "target_charlie",
+    }
+
+    # Switch primary focus to target_bravo
+    svc.apply_control_command({"command": "select_target", "target_id": "target_bravo"})
+    msg_bravo = svc.tick()
+    assert msg_bravo.target_id == "target_bravo"
+

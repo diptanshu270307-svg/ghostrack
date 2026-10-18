@@ -143,9 +143,29 @@ class CompetingTrackerEstimate(BaseModel):
     status: str = "active"
 
 
+class PeerTargetSummary(BaseModel):
+    """Live state of each simultaneously tracked person/tag in the room."""
+    target_id: str
+    label: str
+    color: str
+    x: float
+    y: float
+    true_x: float
+    true_y: float
+    sigma: float
+    confidence_within_2m: float
+    state: TrackingState
+    rejected_anchors: List[str] = Field(default_factory=list)
+
+
 class WebSocketStreamMessage(BaseModel):
     """Frame pushed over WebSocket to the React dashboard."""
     ts: float = Field(..., description="Timestamp of estimated frame")
+    target_id: str = Field("target_alpha", description="Currently focused target ID")
+    active_targets_count: int = Field(1, description="Number of people/tags tracked simultaneously")
+    peer_targets: List[PeerTargetSummary] = Field(
+        default_factory=list, description="All simultaneously tracked people/robots in the room"
+    )
     x: float = Field(..., description="Estimated target X position in meters")
     y: float = Field(..., description="Estimated target Y position in meters")
     sigma: float = Field(..., description="Estimated position standard deviation (uncertainty) in meters")
