@@ -1,16 +1,9 @@
 """
 CNN-LSTM Sequential Tracker (PPT Stage 03b).
-Architecture:
-  1. Temporal 1D Convolution (nn.Conv1d) -> smooths local high-frequency multipath noise.
-  2. Recurrent LSTM (nn.LSTM) -> learns target velocity momentum and trajectory dynamics.
-  3. Dual Head -> outputs 2D position refinement (x, y) and log-variance (uncertainty sigma).
-
-Loss Function Rationale (Why Huber Loss):
-  - Standard MSE (L2) squares residual NLOS spikes, causing gradient explosion and jumping estimates.
-  - Pure MAE (L1) has discontinuous derivatives at zero, causing jitter when locked on target.
-  - Huber Loss (smooth L1) behaves quadratically for small errors (|e| < delta) for sub-decimeter
-    precision, and linearly for large errors (|e| >= delta) so unrejected multipath outliers
-    cannot pull the LSTM momentum off course.
+Integrates the exact 36-feature `CNNLSTM` architecture from `ghosttrack.py`
+(`ghosttrack_model.pt`, WINDOW=40, SCALE=25.0, MAX_A=6) alongside the real-time
+sliding window momentum filter so live WebSocket streaming and offline benchmarks
+share the same core PyTorch architecture.
 """
 
 from typing import Dict, List, Tuple, Optional
@@ -21,17 +14,17 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from ghosttrack import build_model, MAX_A, SCALE, WINDOW, multilaterate
 from shared.schemas import EngineOutput, IMUPayload
-from engine.contradiction import weighted_trilaterate
 
 
 class HuberUncertaintyLoss(nn.Module):
     """
     Heteroscedastic Huber Loss combining outlier-resilient Huber regression
-    with learned log-variance uncertainty calibration.
+    with learned error-radius uncertainty calibration (matching ghosttrack.py).
     """
 
-    def __init__(self, delta: float = 0.03) -> None:
+    def __init__(self, delta: float = 0.04) -> None:
         super().__init__()
         self.huber = nn.HuberLoss(reduction="none", delta=delta)
 
@@ -43,7 +36,6 @@ class HuberUncertaintyLoss(nn.Module):
     ) -> torch.Tensor:
         log_var_clamped = torch.clamp(log_var, min=-5.0, max=2.0)
         huber_err = self.huber(pred_xy, target_xy).sum(dim=-1)
-        # Direct Huber loss + calibrated variance matching term
         target_log_var = torch.log(torch.clamp(huber_err.detach() * 20.0 + 0.08, min=0.04, max=4.0))
         var_loss = nn.functional.mse_loss(log_var_clamped, target_log_var)
         return huber_err.mean() * 10.0 + 0.2 * var_loss
@@ -52,12 +44,6 @@ class HuberUncertaintyLoss(nn.Module):
 class CNNLSTMTrackerNet(nn.Module):
     """
     1D Convolution + LSTM hybrid network for sequential indoor trajectory tracking.
-    Input shape: (batch, seq_len, in_channels=10)
-      Features per timestep:
-        [norm_x_obs, norm_y_obs, vx_obs, vy_obs, confidence, anchors_ratio, ax, ay, gz, dt]
-    Outputs:
-      - delta_xy: residual trajectory smoothing correction in normalized coordinates
-      - log_var: log(sigma^2) spatial uncertainty
     """
 
     def __init__(
@@ -104,16 +90,15 @@ class CNNLSTMTrackerNet(nn.Module):
         x_conv = self.conv1d(x.transpose(1, 2))
         lstm_out, _ = self.lstm(x_conv.transpose(1, 2))
         last_hidden = lstm_out[:, -1, :]
-        delta_xy = torch.tanh(self.pos_head(last_hidden)) * 0.03  # Fine local multipath correction
+        delta_xy = torch.tanh(self.pos_head(last_hidden)) * 0.03
         log_var = self.logvar_head(last_hidden).squeeze(-1)
         return delta_xy, log_var
 
 
 class CNNLSTMTracker:
     """
-    Stateful sliding-window CNN-LSTM tracker that maintains a 20-step history buffer,
-    fuses AI-bias-corrected distances, estimates target momentum (vx, vy),
-    and outputs smoothed (x, y) + calibrated uncertainty sigma.
+    Stateful sliding-window CNN-LSTM tracker supporting both the 36-feature
+    `ghosttrack_model.pt` (from `ghosttrack.py`) and the 10-feature residual refinement net.
     """
 
     def __init__(
@@ -143,7 +128,21 @@ class CNNLSTMTracker:
                 pass
         self.net.eval()
 
+        # Also load ghosttrack_model.pt (36 features, WINDOW=40) if present
+        self.gt_net = build_model(n_feat=36, hidden=96).to(self.device)
+        self.gt_loaded = False
+        if os.path.exists("ghosttrack_model.pt"):
+            try:
+                gt_state = torch.load("ghosttrack_model.pt", map_location=self.device, weights_only=True)
+                self.gt_net.load_state_dict(gt_state)
+                self.gt_loaded = True
+                self.trained_loaded = True
+            except Exception:
+                pass
+        self.gt_net.eval()
+
         self.history: deque = deque(maxlen=window_size)
+        self.gt_history: deque = deque(maxlen=WINDOW)
         self.last_pos: Optional[Tuple[float, float]] = None
         self.last_ts: Optional[float] = None
         self.vx: float = 0.0
@@ -151,6 +150,7 @@ class CNNLSTMTracker:
 
     def reset(self) -> None:
         self.history.clear()
+        self.gt_history.clear()
         self.last_pos = None
         self.last_ts = None
         self.vx = 0.0
@@ -167,23 +167,58 @@ class CNNLSTMTracker:
         if anchor_map is not None:
             self.anchor_map = anchor_map
 
+    def _build_36_feature_step(
+        self,
+        engine_out: EngineOutput,
+        imu: Optional[IMUPayload],
+    ) -> List[float]:
+        """Build the 36-element feature vector matching ghosttrack.py::build_windows."""
+        feat36: List[float] = []
+        anchor_ids = sorted(self.anchor_map.keys())
+        scored_by_id = {s.anchor_id: s for s in engine_out.scored_readings}
+
+        for a in range(MAX_A):
+            if a < len(anchor_ids):
+                aid = anchor_ids[a]
+                ax, ay = self.anchor_map[aid]
+                sr = scored_by_id.get(aid)
+                if sr is not None and sr.online:
+                    vis = 1.0
+                    d_norm = sr.corrected_distance / SCALE
+                    wt = sr.reliability_score
+                else:
+                    vis = 0.0
+                    d_norm = 0.0
+                    wt = 0.0
+                feat36.extend([d_norm * vis, vis, ax / SCALE, ay / SCALE, wt * vis])
+            else:
+                feat36.extend([0.0, 0.0, 0.0, 0.0, 0.0])
+
+        if engine_out.consensus_point is not None and engine_out.anchors_visible >= 3:
+            geo_x = engine_out.consensus_point.x / SCALE
+            geo_y = engine_out.consensus_point.y / SCALE
+            has_geo = 1.0
+        else:
+            geo_x, geo_y, has_geo = 0.0, 0.0, 0.0
+
+        acc_x = (imu.ax if imu else 0.0) / 3.0
+        acc_y = (imu.ay if imu else 0.0) / 3.0
+        gyro_z = (imu.gz if imu else 0.0) / 2.0
+        feat36.extend([geo_x, geo_y, has_geo, acc_x, acc_y, gyro_z])
+        return feat36
+
     def step(
         self,
         engine_out: EngineOutput,
         imu: Optional[IMUPayload],
         total_anchors: int = 4,
     ) -> Tuple[float, float, float, Tuple[float, float]]:
-        """
-        Process one frame through the temporal Conv1D + LSTM tracker.
-        Returns: (est_x, est_y, sigma, (vx, vy))
-        """
         ts = engine_out.ts
         dt = 0.1
         if self.last_ts is not None and ts > self.last_ts:
             dt = min(1.0, max(0.01, ts - self.last_ts))
         self.last_ts = ts
 
-        # If anchor_map and AI-scored readings are available, compute AI-bias-corrected trilateration
         online_scored = [
             s for s in engine_out.scored_readings
             if s.online and s.anchor_id in self.anchor_map
@@ -193,10 +228,9 @@ class CNNLSTMTracker:
             corr_dists = np.array([s.corrected_distance for s in online_scored], dtype=float)
             weights = np.array([s.reliability_score ** 2 for s in online_scored], dtype=float)
             init_xy = np.array([engine_out.consensus_point.x, engine_out.consensus_point.y])
-            refined_xy, _ = weighted_trilaterate(
-                coords, corr_dists, weights, (self.room_width, self.room_height), init_guess=init_xy
-            )
-            obs_x, obs_y = float(refined_xy[0]), float(refined_xy[1])
+            refined_xy = multilaterate(coords, corr_dists, w=weights, p0=init_xy)
+            obs_x = float(np.clip(refined_xy[0], 0.0, self.room_width))
+            obs_y = float(np.clip(refined_xy[1], 0.0, self.room_height))
         elif engine_out.consensus_point is not None:
             obs_x = engine_out.consensus_point.x
             obs_y = engine_out.consensus_point.y
@@ -205,13 +239,30 @@ class CNNLSTMTracker:
         else:
             obs_x, obs_y = self.room_width / 2.0, self.room_height / 2.0
 
-        # Kinematic momentum filter (Kalman-like alpha-beta update)
+        # Run 36-feature ghosttrack.py CNNLSTM if loaded
+        gt_rad_sigma: Optional[float] = None
+        if self.gt_loaded and self.anchor_map:
+            f36 = self._build_36_feature_step(engine_out, imu)
+            self.gt_history.append(f36)
+            seq36 = list(self.gt_history)
+            while len(seq36) < WINDOW:
+                seq36.insert(0, seq36[0])
+            x36 = torch.tensor([seq36], dtype=torch.float32, device=self.device)
+            with torch.no_grad():
+                gt_pos, gt_rad = self.gt_net(x36)
+            gt_x = float(gt_pos[0, 0].item()) * SCALE
+            gt_y = float(gt_pos[0, 1].item()) * SCALE
+            gt_rad_sigma = float(gt_rad[0].item()) * SCALE
+            # Blend ghosttrack CNN-LSTM prediction when anchors are sparse
+            if engine_out.anchors_visible < 3:
+                obs_x = 0.75 * obs_x + 0.25 * float(np.clip(gt_x, 0.2, self.room_width - 0.2))
+                obs_y = 0.75 * obs_y + 0.25 * float(np.clip(gt_y, 0.2, self.room_height - 0.2))
+
         if self.last_pos is not None:
             pred_x = self.last_pos[0] + self.vx * dt
             pred_y = self.last_pos[1] + self.vy * dt
             innovation_dist = math.hypot(obs_x - pred_x, obs_y - pred_y)
 
-            # Downweight sudden multi-meter jumps caused by simultaneous multi-wall NLOS
             jump_penalty = 1.0 / (1.0 + (max(0.0, innovation_dist - 0.6) / 0.8) ** 2)
             effective_conf = engine_out.confidence * jump_penalty
 
@@ -261,6 +312,8 @@ class CNNLSTMTracker:
         dx = float(delta_xy[0, 0].item()) * self.room_width
         dy = float(delta_xy[0, 1].item()) * self.room_height
         nn_sigma = math.sqrt(math.exp(float(log_var[0].item())))
+        if gt_rad_sigma is not None:
+            nn_sigma = 0.5 * nn_sigma + 0.5 * min(3.5, max(0.2, gt_rad_sigma))
 
         final_x = float(np.clip(smooth_x + dx, 0.2, self.room_width - 0.2))
         final_y = float(np.clip(smooth_y + dy, 0.2, self.room_height - 0.2))
