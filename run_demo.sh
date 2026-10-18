@@ -71,7 +71,7 @@ fi
 
 # 3. Start Backend (FastAPI + WebSockets)
 echo -e "${CYAN}[2/4] Starting FastAPI Backend on http://127.0.0.1:8000...${NC}"
-"$VENV_PYTHON" -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --log-level info &
+"$VENV_PYTHON" -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload --log-level info &
 PIDS+=($!)
 sleep 1
 

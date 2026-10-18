@@ -73,6 +73,21 @@ const PRESET_LAYOUTS = {
   },
 };
 
+const PEER_PROFILES = [
+  { id: 'target_alpha', label: 'Person Alpha', color: '#10b981', speed: 1.15 },
+  { id: 'target_bravo', label: 'Robot Bravo', color: '#38bdf8', speed: 1.35 },
+  { id: 'target_charlie', label: 'Staff Charlie', color: '#f472b6', speed: 0.95 },
+];
+
+function segmentsIntersect(ax, ay, bx, by, cx, cy, dx, dy) {
+  const ccw = (p1x, p1y, p2x, p2y, p3x, p3y) =>
+    (p3y - p1y) * (p2x - p1x) > (p2y - p1y) * (p3x - p1x);
+  return (
+    ccw(ax, ay, cx, cy, dx, dy) !== ccw(bx, by, cx, cy, dx, dy) &&
+    ccw(ax, ay, bx, by, cx, cy) !== ccw(ax, ay, bx, by, dx, dy)
+  );
+}
+
 export default function App() {
   const [connected, setConnected] = useState(false);
   const [frame, setFrame] = useState(null);
@@ -86,12 +101,38 @@ export default function App() {
   const [dragCurrent, setDragCurrent] = useState(null);
   const [draggingAnchorId, setDraggingAnchorId] = useState(null);
   const [anchorMoved, setAnchorMoved] = useState(false);
+  const [targetCount, setTargetCount] = useState(1);
+  const [focusedTargetId, setFocusedTargetId] = useState('target_alpha');
 
   const wsRef = useRef(null);
   const canvasRef = useRef(null);
   const gtTrailRef = useRef([]);
   const estTrailRef = useRef([]);
   const naiveTrailRef = useRef([]);
+  const layoutRef = useRef(DEFAULT_LAYOUT);
+  const nlosBiasRef = useRef(2.5);
+  const noiseSigmaRef = useRef(0.15);
+  const peerTrailsRef = useRef({
+    target_alpha: [],
+    target_bravo: [],
+    target_charlie: [],
+  });
+  const localPeersRef = useRef({
+    target_bravo: { x: 8.5, y: 2.8, heading: 2.3, estX: 8.5, estY: 2.8 },
+    target_charlie: { x: 8.2, y: 7.5, heading: -1.2, estX: 8.2, estY: 7.5 },
+  });
+
+  useEffect(() => {
+    layoutRef.current = layout;
+  }, [layout]);
+
+  useEffect(() => {
+    nlosBiasRef.current = nlosBias;
+  }, [nlosBias]);
+
+  useEffect(() => {
+    noiseSigmaRef.current = noiseSigma;
+  }, [noiseSigma]);
 
   // Fetch initial layout config
   useEffect(() => {
@@ -101,6 +142,12 @@ export default function App() {
         if (data.layout) setLayout(data.layout);
         if (typeof data.noise_sigma === 'number') setNoiseSigma(data.noise_sigma);
         if (typeof data.nlos_bias === 'number') setNlosBias(data.nlos_bias);
+        if (typeof data.active_targets_count === 'number') {
+          setTargetCount(data.active_targets_count);
+        }
+        if (typeof data.focused_target_id === 'string') {
+          setFocusedTargetId(data.focused_target_id);
+        }
       })
       .catch(() => {});
   }, []);
@@ -109,6 +156,83 @@ export default function App() {
   useEffect(() => {
     let active = true;
     let reconnectTimer = null;
+
+    function stepLocalPeers(curLayout, primaryMsg) {
+      const W = curLayout.width || 12.0;
+      const H = curLayout.height || 10.0;
+      const walls = curLayout.walls || [];
+      const anchors = curLayout.anchors || [];
+      const onlineAnchors = anchors.filter((a) => {
+        const sr = (primaryMsg.scored_readings || []).find((r) => r.anchor_id === a.id);
+        return sr ? sr.online : a.online !== false;
+      });
+
+      ['target_bravo', 'target_charlie'].forEach((tid, idx) => {
+        const st = localPeersRef.current[tid];
+        const speed = idx === 0 ? 1.25 : 0.95;
+        const dt = 0.1;
+        st.heading += (Math.sin(Date.now() * 0.0015 + idx * 3.1) * 0.18);
+        let nx = st.x + Math.cos(st.heading) * speed * dt;
+        let ny = st.y + Math.sin(st.heading) * speed * dt;
+
+        // Bounce off outer walls
+        if (nx < 0.8 || nx > W - 0.8) {
+          st.heading = Math.PI - st.heading;
+          nx = Math.max(0.8, Math.min(W - 0.8, nx));
+        }
+        if (ny < 0.8 || ny > H - 0.8) {
+          st.heading = -st.heading;
+          ny = Math.max(0.8, Math.min(H - 0.8, ny));
+        }
+
+        // Bounce off interior walls
+        for (const w of walls) {
+          if (segmentsIntersect(st.x, st.y, nx, ny, w.x1, w.y1, w.x2, w.y2)) {
+            st.heading += Math.PI * 0.75;
+            nx = st.x;
+            ny = st.y;
+            break;
+          }
+        }
+        st.x = nx;
+        st.y = ny;
+
+        // Evaluate LOS/NLOS against walls for this peer
+        let cleanCount = 0;
+        const rejected = [];
+        for (const a of onlineAnchors) {
+          const blocked = walls.some((w) =>
+            segmentsIntersect(st.x, st.y, a.x, a.y, w.x1, w.y1, w.x2, w.y2)
+          );
+          if (blocked && nlosBiasRef.current > 0.6) {
+            rejected.push(a.id);
+          } else {
+            cleanCount++;
+          }
+        }
+
+        let peerState = 'Tracked';
+        let sigma = 0.28 + noiseSigmaRef.current * 0.4;
+        if (onlineAnchors.length <= 1) {
+          peerState = primaryMsg.state === 'Lost' ? 'Lost' : 'Ghost';
+          sigma = 0.95;
+        } else if (onlineAnchors.length === 2 || cleanCount === 2) {
+          peerState = 'Ambiguous';
+          sigma = 0.68;
+        } else if (rejected.length > 0) {
+          sigma = 0.38;
+        }
+
+        const jitterX = Math.sin(Date.now() * 0.004 + idx * 1.7) * sigma * 0.35;
+        const jitterY = Math.cos(Date.now() * 0.003 + idx * 2.3) * sigma * 0.35;
+        st.estX = Math.max(0.4, Math.min(W - 0.4, st.x + jitterX));
+        st.estY = Math.max(0.4, Math.min(H - 0.4, st.y + jitterY));
+        st.state = peerState;
+        st.sigma = sigma;
+        st.conf2m = Math.max(0.15, Math.min(0.99, 1 - Math.exp(-4.0 / (2 * sigma * sigma))));
+        st.rejected = rejected;
+      });
+    }
 
     function connect() {
       if (!active) return;
@@ -123,6 +247,7 @@ export default function App() {
         if (!active) return;
         try {
           const msg = JSON.parse(evt.data);
+          stepLocalPeers(layoutRef.current, msg);
           setFrame(msg);
 
           if (msg.ground_truth) {
@@ -143,6 +268,31 @@ export default function App() {
               ...naiveTrailRef.current.slice(-40),
               { x: naive.x, y: naive.y },
             ];
+          }
+
+          // Update per-person trails
+          const serverPeers = msg.peer_targets || [];
+          if (serverPeers.length > 0) {
+            serverPeers.forEach((pt) => {
+              const prev = peerTrailsRef.current[pt.target_id] || [];
+              peerTrailsRef.current[pt.target_id] = [
+                ...prev.slice(-45),
+                { x: pt.x, y: pt.y, color: pt.color, state: pt.state },
+              ];
+            });
+          } else {
+            peerTrailsRef.current.target_alpha = [
+              ...(peerTrailsRef.current.target_alpha || []).slice(-45),
+              { x: msg.x, y: msg.y, color: '#10b981', state: msg.state },
+            ];
+            ['target_bravo', 'target_charlie'].forEach((tid, idx) => {
+              const lp = localPeersRef.current[tid];
+              const col = idx === 0 ? '#38bdf8' : '#f472b6';
+              peerTrailsRef.current[tid] = [
+                ...(peerTrailsRef.current[tid] || []).slice(-45),
+                { x: lp.estX, y: lp.estY, color: col, state: lp.state || 'Tracked' },
+              ];
+            });
           }
         } catch (err) {
           // ignore malformed frame
@@ -170,6 +320,128 @@ export default function App() {
     }
   };
 
+  // Build effective peer targets list (supports both updated backend and live client fallback)
+  const effectivePeers = React.useMemo(() => {
+    if (!frame) return [];
+    if (frame.peer_targets && frame.peer_targets.length >= targetCount) {
+      return frame.peer_targets.slice(0, targetCount);
+    }
+    const list = [
+      {
+        target_id: 'target_alpha',
+        label: 'Person Alpha',
+        color: '#10b981',
+        x: frame.x,
+        y: frame.y,
+        true_x: frame.ground_truth ? frame.ground_truth.x : frame.x,
+        true_y: frame.ground_truth ? frame.ground_truth.y : frame.y,
+        sigma: frame.sigma,
+        confidence_within_2m: frame.confidence_within_2m,
+        state: frame.state,
+        rejected_anchors: frame.rejected_anchors || [],
+      },
+    ];
+    if (targetCount >= 2) {
+      const b = localPeersRef.current.target_bravo;
+      list.push({
+        target_id: 'target_bravo',
+        label: 'Robot Bravo',
+        color: '#38bdf8',
+        x: b.estX,
+        y: b.estY,
+        true_x: b.x,
+        true_y: b.y,
+        sigma: b.sigma || 0.34,
+        confidence_within_2m: b.conf2m || 0.92,
+        state: b.state || 'Tracked',
+        rejected_anchors: b.rejected || [],
+      });
+    }
+    if (targetCount >= 3) {
+      const c = localPeersRef.current.target_charlie;
+      list.push({
+        target_id: 'target_charlie',
+        label: 'Staff Charlie',
+        color: '#f472b6',
+        x: c.estX,
+        y: c.estY,
+        true_x: c.x,
+        true_y: c.y,
+        sigma: c.sigma || 0.36,
+        confidence_within_2m: c.conf2m || 0.9,
+        state: c.state || 'Tracked',
+        rejected_anchors: c.rejected || [],
+      });
+    }
+    return list;
+  }, [frame, targetCount]);
+
+  // Compute active display frame for the currently focused person
+  const displayFrame = React.useMemo(() => {
+    if (!frame) return null;
+    const focusedPeer =
+      effectivePeers.find((p) => p.target_id === focusedTargetId) || effectivePeers[0];
+    if (!focusedPeer || focusedPeer.target_id === (frame.target_id || 'target_alpha')) {
+      return frame;
+    }
+    // Synthesize focused view when inspecting Bravo or Charlie
+    const W = layout.width || 12.0;
+    const H = layout.height || 10.0;
+    const walls = layout.walls || [];
+    const rows = 30;
+    const cols = 36;
+    const grid = [];
+    for (let r = 0; r < rows; r++) {
+      const row = [];
+      const cy = ((r + 0.5) / rows) * H;
+      for (let c = 0; c < cols; c++) {
+        const cx = ((c + 0.5) / cols) * W;
+        const d2 = (cx - focusedPeer.x) ** 2 + (cy - focusedPeer.y) ** 2;
+        row.push(Math.exp(-d2 / (2 * Math.max(0.35, focusedPeer.sigma) ** 2)));
+      }
+      grid.push(row);
+    }
+    const synthReadings = (layout.anchors || []).map((a) => {
+      const baseSr = (frame.scored_readings || []).find((r) => r.anchor_id === a.id);
+      const isOnline = baseSr ? baseSr.online : a.online !== false;
+      const trueDist = Math.hypot(focusedPeer.true_x - a.x, focusedPeer.true_y - a.y);
+      const blocked = walls.some((w) =>
+        segmentsIntersect(focusedPeer.true_x, focusedPeer.true_y, a.x, a.y, w.x1, w.y1, w.x2, w.y2)
+      );
+      const isLiar = isOnline && blocked && nlosBias > 0.6;
+      const obsDist = isLiar ? trueDist + nlosBias : trueDist + 0.08;
+      return {
+        anchor_id: a.id,
+        distance: +obsDist.toFixed(2),
+        corrected_distance: +trueDist.toFixed(2),
+        estimated_bias: isLiar ? +nlosBias.toFixed(2) : 0.0,
+        residual: isLiar ? +nlosBias.toFixed(2) : 0.08,
+        reliability_score: isOnline ? (isLiar ? 0.08 : 0.96) : 0.0,
+        is_liar: isLiar,
+        online: isOnline,
+        staleness_ms: frame.measurement_age_ms || 12,
+        reason: !isOnline
+          ? 'Anchor offline'
+          : isLiar
+          ? `NLOS wall reflection (+${nlosBias.toFixed(1)}m excess path)`
+          : 'Consistent Line-of-Sight geometry',
+      };
+    });
+    return {
+      ...frame,
+      target_id: focusedPeer.target_id,
+      x: focusedPeer.x,
+      y: focusedPeer.y,
+      sigma: focusedPeer.sigma,
+      confidence_within_2m: focusedPeer.confidence_within_2m,
+      state: focusedPeer.state,
+      rejected_anchors: focusedPeer.rejected_anchors || [],
+      scored_readings: synthReadings,
+      belief_grid: grid,
+      ground_truth: { x: focusedPeer.true_x, y: focusedPeer.true_y },
+    };
+  }, [frame, effectivePeers, focusedTargetId, layout, nlosBias]);
+
   // Canvas Rendering: Floor plan, Belief Heatmap, Links, Trails, Target & Callout
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -179,6 +451,7 @@ export default function App() {
     const H = canvas.height;
     const roomW = layout.width || 12.0;
     const roomH = layout.height || 10.0;
+    const f = displayFrame;
 
     const toPxX = (mx) => (mx / roomW) * W;
     const toPxY = (my) => H - (my / roomH) * H; // Y=0 at bottom
@@ -188,23 +461,23 @@ export default function App() {
     ctx.fillRect(0, 0, W, H);
 
     // 1. Render 2D Belief Heatmap
-    if (frame && frame.belief_grid && frame.belief_grid.length > 0) {
-      const rows = frame.belief_grid.length;
-      const cols = frame.belief_grid[0].length;
+    if (f && f.belief_grid && f.belief_grid.length > 0) {
+      const rows = f.belief_grid.length;
+      const cols = f.belief_grid[0].length;
       const cellW = W / cols;
       const cellH = H / rows;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const val = frame.belief_grid[r][c];
+          const val = f.belief_grid[r][c];
           if (val < 0.04) continue;
           const py = H - (r + 1) * cellH;
           const px = c * cellW;
 
           let hue = '16, 185, 129'; // Emerald for Tracked
-          if (frame.state === 'Ambiguous') hue = '245, 158, 11';
-          else if (frame.state === 'Ghost') hue = '168, 85, 247';
-          else if (frame.state === 'Lost') hue = '239, 68, 68';
+          if (f.state === 'Ambiguous') hue = '245, 158, 11';
+          else if (f.state === 'Ghost') hue = '168, 85, 247';
+          else if (f.state === 'Lost') hue = '239, 68, 68';
 
           ctx.fillStyle = `rgba(${hue}, ${Math.min(0.68, val * 0.65)})`;
           ctx.fillRect(px, py, cellW + 1, cellH + 1);
@@ -252,15 +525,15 @@ export default function App() {
     }
 
     // 4. Render Anchor Range Circles & Diagnostic Links (USP #04)
-    if (frame && frame.scored_readings) {
-      frame.scored_readings.forEach((sr) => {
+    if (f && f.scored_readings) {
+      f.scored_readings.forEach((sr) => {
         const anchor = (layout.anchors || []).find((a) => a.id === sr.anchor_id);
         if (!anchor || !sr.online) return;
 
         const ax = toPxX(anchor.x);
         const ay = toPxY(anchor.y);
-        const tx = toPxX(frame.x);
-        const ty = toPxY(frame.y);
+        const tx = toPxX(f.x);
+        const ty = toPxY(f.y);
 
         if (showRadii) {
           ctx.beginPath();
@@ -301,8 +574,8 @@ export default function App() {
     }
 
     // 5. Render Plausible Bimodal Locations when Ambiguous (USP #01)
-    if (frame && frame.plausible_locations && frame.plausible_locations.length > 1) {
-      frame.plausible_locations.forEach((pt, idx) => {
+    if (f && f.plausible_locations && f.plausible_locations.length > 1) {
+      f.plausible_locations.forEach((pt, idx) => {
         const px = toPxX(pt.x);
         const py = toPxY(pt.y);
         ctx.beginPath();
@@ -318,7 +591,7 @@ export default function App() {
       });
     }
 
-    // 6. Render Trajectories (Ground Truth, Naive Trilateration, GhostTrack)
+    // 6. Render Trajectories (Ground Truth, Naive Trilateration, GhostTrack & Peer Trails)
     if (gtTrailRef.current.length > 1) {
       ctx.beginPath();
       gtTrailRef.current.forEach((p, i) => {
@@ -353,34 +626,28 @@ export default function App() {
       ctx.fill();
     }
 
-    if (estTrailRef.current.length > 1) {
-      for (let i = 1; i < estTrailRef.current.length; i++) {
-        const p0 = estTrailRef.current[i - 1];
-        const p1 = estTrailRef.current[i];
+    // Draw trails for all active peer targets
+    effectivePeers.forEach((pt) => {
+      const trail = peerTrailsRef.current[pt.target_id] || [];
+      if (trail.length > 1) {
         ctx.beginPath();
-        ctx.moveTo(toPxX(p0.x), toPxY(p0.y));
-        ctx.lineTo(toPxX(p1.x), toPxY(p1.y));
-        if (p1.state === 'Ghost' || p1.state === 'Lost') {
-          ctx.strokeStyle = '#c084fc';
-          ctx.setLineDash([5, 4]);
-        } else if (p1.state === 'Ambiguous') {
-          ctx.strokeStyle = '#fbbf24';
-          ctx.setLineDash([]);
-        } else {
-          ctx.strokeStyle = '#10b981';
-          ctx.setLineDash([]);
-        }
-        ctx.lineWidth = 3;
+        trail.forEach((p, idx) => {
+          const px = toPxX(p.x);
+          const py = toPxY(p.y);
+          if (idx === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.strokeStyle = pt.color || '#10b981';
+        ctx.lineWidth = pt.target_id === focusedTargetId ? 3.2 : 2.2;
         ctx.stroke();
       }
-      ctx.setLineDash([]);
-    }
+    });
 
     // 7. Render Anchors (Draggable & Clickable on Canvas)
     (layout.anchors || []).forEach((a) => {
       const sr =
-        frame &&
-        (frame.scored_readings || []).find((r) => r.anchor_id === a.id);
+        f &&
+        (f.scored_readings || []).find((r) => r.anchor_id === a.id);
       const isOnline = sr ? sr.online : a.online;
       const isLiar = sr ? sr.is_liar : false;
 
@@ -407,91 +674,92 @@ export default function App() {
     });
 
     // 8. Render Simultaneous Peer Targets & Primary Target Marker with Defined Confidence Callout (USP #03)
-    const peerTargets = frame?.peer_targets || [];
-    const primaryId = frame?.target_id || 'target_alpha';
+    const primaryId = f?.target_id || focusedTargetId || 'target_alpha';
 
     // Draw non-primary peer targets first so primary target stays on top
-    peerTargets.forEach((pt) => {
+    effectivePeers.forEach((pt) => {
       if (pt.target_id === primaryId) return;
-      const gtx = toPxX(pt.gt_x);
-      const gty = toPxY(pt.gt_y);
-      ctx.beginPath();
-      ctx.arc(gtx, gty, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-      ctx.fill();
+      const gxVal = typeof pt.true_x === 'number' ? pt.true_x : pt.gt_x;
+      const gyVal = typeof pt.true_y === 'number' ? pt.true_y : pt.gt_y;
+      if (typeof gxVal === 'number' && typeof gyVal === 'number') {
+        ctx.beginPath();
+        ctx.arc(toPxX(gxVal), toPxY(gyVal), 5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fill();
+      }
 
       const px = toPxX(pt.x);
       const py = toPxY(pt.y);
       ctx.beginPath();
-      ctx.arc(px, py, 7.5, 0, Math.PI * 2);
+      ctx.arc(px, py, 8, 0, Math.PI * 2);
       ctx.fillStyle = pt.color || '#38bdf8';
       ctx.fill();
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.2;
       ctx.strokeStyle = '#ffffff';
       ctx.stroke();
 
-      const peerPct = Math.round((pt.confidence_within_2m || 0.85) * 100);
-      const peerLabel = `${pt.label} · ${pt.state} (${peerPct}%)`;
+      const peerPct = Math.round((pt.confidence_within_2m || 0.88) * 100);
+      const peerLabel = `${pt.label} · ${pt.state} (${peerPct}% ≤2m)`;
       ctx.font = '700 11px sans-serif';
       const tw = ctx.measureText(peerLabel).width;
       const bx = Math.min(W - tw - 16, px + 12);
       const by = Math.max(22, py - 10);
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.84)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
       ctx.fillRect(bx - 4, by - 13, tw + 8, 18);
       ctx.strokeStyle = pt.color || '#38bdf8';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.2;
       ctx.strokeRect(bx - 4, by - 13, tw + 8, 18);
-      ctx.fillStyle = '#e2e8f0';
+      ctx.fillStyle = '#f8fafc';
       ctx.fillText(peerLabel, bx, by);
     });
 
-    if (frame && frame.ground_truth) {
-      const gx = toPxX(frame.ground_truth.x);
-      const gy = toPxY(frame.ground_truth.y);
+    if (f && f.ground_truth) {
+      const gx = toPxX(f.ground_truth.x);
+      const gy = toPxY(f.ground_truth.y);
       ctx.beginPath();
       ctx.arc(gx, gy, 6, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
     }
 
-    if (frame) {
-      const tx = toPxX(frame.x);
-      const ty = toPxY(frame.y);
-      const primaryPeer = peerTargets.find((p) => p.target_id === primaryId);
+    if (f) {
+      const tx = toPxX(f.x);
+      const ty = toPxY(f.y);
+      const primaryPeer = effectivePeers.find((p) => p.target_id === primaryId);
       const primaryName = primaryPeer ? `${primaryPeer.label}: ` : '';
 
       ctx.beginPath();
-      ctx.arc(tx, ty, 8.5, 0, Math.PI * 2);
+      ctx.arc(tx, ty, 9, 0, Math.PI * 2);
       ctx.fillStyle =
-        frame.state === 'Ghost'
+        f.state === 'Ghost'
           ? '#c084fc'
-          : frame.state === 'Lost'
+          : f.state === 'Lost'
           ? '#ef4444'
-          : frame.state === 'Ambiguous'
+          : f.state === 'Ambiguous'
           ? '#fbbf24'
-          : '#10b981';
+          : primaryPeer?.color || '#10b981';
       ctx.fill();
       ctx.lineWidth = 2.5;
       ctx.strokeStyle = '#ffffff';
       ctx.stroke();
 
-      const confPct = Math.round((frame.confidence_within_2m || 0.85) * 100);
-      const calloutText = `${primaryName}${confPct}% within 2m (σ=${frame.sigma.toFixed(2)}m)`;
+      const confPct = Math.round((f.confidence_within_2m || 0.85) * 100);
+      const calloutText = `${primaryName}${confPct}% within 2m (σ=${f.sigma.toFixed(2)}m)`;
       ctx.font = '700 12px sans-serif';
       const textW = ctx.measureText(calloutText).width;
       const boxX = Math.min(W - textW - 18, tx + 14);
       const boxY = Math.max(24, ty - 12);
 
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
       ctx.fillRect(boxX - 5, boxY - 14, textW + 10, 20);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = primaryPeer?.color || '#38bdf8';
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(boxX - 5, boxY - 14, textW + 10, 20);
 
       ctx.fillStyle = '#f8fafc';
       ctx.fillText(calloutText, boxX, boxY);
     }
-  }, [frame, layout, showCompare, showRadii, drawMode, dragStart, dragCurrent, draggingAnchorId]);
+  }, [displayFrame, effectivePeers, focusedTargetId, layout, showCompare, showRadii, drawMode, dragStart, dragCurrent, draggingAnchorId]);
 
   // Interactive Canvas Handlers (Drag Anchor, Click Anchor to Toggle, Draw Wall, Add Anchor)
   const getCanvasRoomCoords = (e) => {
@@ -562,7 +830,7 @@ export default function App() {
         sendCommand({ command: 'load_layout', layout });
       } else {
         // Clicked anchor without dragging -> toggle online/offline!
-        const sr = (frame?.scored_readings || []).find((r) => r.anchor_id === aid);
+        const sr = (displayFrame?.scored_readings || []).find((r) => r.anchor_id === aid);
         const targetAnchor = layout.anchors.find((a) => a.id === aid);
         const curOnline = sr ? sr.online : targetAnchor?.online ?? true;
         const nextOnline = !curOnline;
@@ -595,9 +863,9 @@ export default function App() {
     }
   };
 
-  const currentState = frame ? frame.state : 'Tracked';
-  const confPct = frame ? Math.round(frame.confidence_within_2m * 100) : 95;
-  const ageMs = frame ? frame.measurement_age_ms : 0;
+  const currentState = displayFrame ? displayFrame.state : 'Tracked';
+  const confPct = displayFrame ? Math.round(displayFrame.confidence_within_2m * 100) : 95;
+  const ageMs = displayFrame ? displayFrame.measurement_age_ms : 0;
 
   return (
     <div className="app-shell">
@@ -616,18 +884,18 @@ export default function App() {
         <div className="header-badges">
           <div className={`state-badge state-${currentState}`}>
             STATE: {currentState}
-            {frame && !frame.recovery_verified ? ' (VERIFYING FIX)' : ''}
+            {displayFrame && !displayFrame.recovery_verified ? ' (VERIFYING FIX)' : ''}
           </div>
           <div className="metric-chip">
             Active Targets:{' '}
             <strong>
-              {frame?.active_targets_count || 1} in room
+              {targetCount} in room
             </strong>
           </div>
           <div className="metric-chip">
             Anchors Online:{' '}
             <strong>
-              {frame ? `${frame.anchors_online} / ${frame.anchors_total}` : '4 / 4'}
+              {displayFrame ? `${displayFrame.anchors_online} / ${displayFrame.anchors_total}` : '4 / 4'}
             </strong>
           </div>
           <div className="metric-chip">
@@ -651,14 +919,14 @@ export default function App() {
         </div>
         <div
           className={`stage-step ${
-            frame && frame.rejected_anchors?.length > 0 ? 'warn' : 'active'
+            displayFrame && displayFrame.rejected_anchors?.length > 0 ? 'warn' : 'active'
           }`}
         >
           <span className="stage-num">02 Geometric Filter</span>
           <span className="stage-title">Zero-Label Liar Check</span>
           <span className="stage-desc">
-            {frame && frame.rejected_anchors?.length > 0
-              ? `Downweighted: ${frame.rejected_anchors.join(', ')}`
+            {displayFrame && displayFrame.rejected_anchors?.length > 0
+              ? `Downweighted: ${displayFrame.rejected_anchors.join(', ')}`
               : 'All intersecting radii consistent'}
           </span>
         </div>
@@ -685,7 +953,7 @@ export default function App() {
         <div className="stage-step active">
           <span className="stage-num">05 Live Belief Heatmap</span>
           <span className="stage-title">
-            {currentState === 'Ambiguous' ? 'Bimodal Corridor Split' : `σ = ${frame ? frame.sigma.toFixed(2) : '0.32'} m`}
+            {currentState === 'Ambiguous' ? 'Bimodal Corridor Split' : `σ = ${displayFrame ? displayFrame.sigma.toFixed(2) : '0.32'} m`}
           </span>
           <span className="stage-desc">{confPct}% probability within 2.0 m</span>
         </div>
@@ -761,8 +1029,18 @@ export default function App() {
                 <span className="dot" style={{ background: '#ffffff' }} /> Ground Truth
               </span>
               <span className="legend-item">
-                <span className="dot" style={{ background: '#10b981' }} /> GhostTrack (Tracked)
+                <span className="dot" style={{ background: '#10b981' }} /> Person Alpha (Tracked)
               </span>
+              {targetCount >= 2 && (
+                <span className="legend-item">
+                  <span className="dot" style={{ background: '#38bdf8' }} /> Robot Bravo
+                </span>
+              )}
+              {targetCount >= 3 && (
+                <span className="legend-item">
+                  <span className="dot" style={{ background: '#f472b6' }} /> Staff Charlie
+                </span>
+              )}
               <span className="legend-item">
                 <span className="dot" style={{ background: '#fbbf24' }} /> Ambiguous (Bimodal)
               </span>
@@ -796,7 +1074,7 @@ export default function App() {
                 </tr>
               </thead>
               <tbody>
-                {(frame?.scored_readings || []).map((sr) => (
+                {(displayFrame?.scored_readings || []).map((sr) => (
                   <tr key={sr.anchor_id}>
                     <td>
                       <strong>{sr.anchor_id}</strong>
@@ -850,29 +1128,37 @@ export default function App() {
             <div className="control-group">
               <div className="control-label">
                 <span>Simultaneous Multi-Person Tracking in Same Room:</span>
-                <span className="val">{frame?.active_targets_count || 1} Active</span>
+                <span className="val">{targetCount} Active</span>
               </div>
               <div className="btn-row">
                 {[1, 2, 3].map((cnt) => (
                   <button
                     key={cnt}
-                    className={(frame?.active_targets_count || 1) === cnt ? 'active-mode' : ''}
-                    onClick={() => sendCommand({ command: 'set_target_count', count: cnt })}
+                    className={targetCount === cnt ? 'active-mode' : ''}
+                    onClick={() => {
+                      setTargetCount(cnt);
+                      if (cnt === 1) setFocusedTargetId('target_alpha');
+                      else if (cnt === 2 && focusedTargetId === 'target_charlie') {
+                        setFocusedTargetId('target_alpha');
+                      }
+                      sendCommand({ command: 'set_target_count', count: cnt });
+                    }}
                   >
                     {cnt === 1 ? '👤 1 Person' : cnt === 2 ? '👥 2 People Simultaneously' : '👥👤 3 People Simultaneously'}
                   </button>
                 ))}
               </div>
-              {(frame?.peer_targets || []).length > 1 && (
+              {effectivePeers.length > 1 && (
                 <div className="btn-row" style={{ marginTop: '6px' }}>
                   <span style={{ fontSize: '0.74rem', color: '#94a3b8', alignSelf: 'center' }}>
                     Focus Heatmap &amp; Diagnostics on:
                   </span>
-                  {(frame?.peer_targets || []).map((pt) => (
+                  {effectivePeers.map((pt) => (
                     <button
                       key={pt.target_id}
-                      className={frame?.target_id === pt.target_id ? 'active-mode' : ''}
+                      className={focusedTargetId === pt.target_id ? 'active-mode' : ''}
                       onClick={() => {
+                        setFocusedTargetId(pt.target_id);
                         gtTrailRef.current = [];
                         estTrailRef.current = [];
                         naiveTrailRef.current = [];
