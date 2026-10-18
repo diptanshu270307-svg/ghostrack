@@ -21,38 +21,54 @@ const DEFAULT_LAYOUT = {
 
 const PRESET_LAYOUTS = {
   default: DEFAULT_LAYOUT,
-  hospital: {
-    room_id: 'room_demo',
-    width: 12.0,
-    height: 10.0,
+  clinic: {
+    room_id: 'room_clinic',
+    width: 8.0,
+    height: 6.0,
     anchors: [
-      { id: 'A1', x: 1.0, y: 1.0, online: true },
-      { id: 'A2', x: 11.0, y: 1.0, online: true },
-      { id: 'A3', x: 11.0, y: 9.0, online: true },
-      { id: 'A4', x: 1.0, y: 9.0, online: true },
-      { id: 'A5', x: 6.0, y: 5.0, online: true },
+      { id: 'A1', x: 0.7, y: 0.7, online: true },
+      { id: 'A2', x: 7.3, y: 0.7, online: true },
+      { id: 'A3', x: 7.3, y: 5.3, online: true },
+      { id: 'A4', x: 0.7, y: 5.3, online: true },
     ],
     walls: [
-      { x1: 4.0, y1: 0.0, x2: 4.0, y2: 4.0 },
-      { x1: 8.0, y1: 0.0, x2: 8.0, y2: 4.0 },
-      { x1: 4.0, y1: 6.5, x2: 4.0, y2: 10.0 },
-      { x1: 8.0, y1: 6.5, x2: 8.0, y2: 10.0 },
+      { x1: 4.0, y1: 0.0, x2: 4.0, y2: 3.5 },
+    ],
+  },
+  hospital: {
+    room_id: 'room_hospital',
+    width: 16.0,
+    height: 12.0,
+    anchors: [
+      { id: 'A1', x: 1.0, y: 1.0, online: true },
+      { id: 'A2', x: 15.0, y: 1.0, online: true },
+      { id: 'A3', x: 15.0, y: 11.0, online: true },
+      { id: 'A4', x: 1.0, y: 11.0, online: true },
+      { id: 'A5', x: 8.0, y: 6.0, online: true },
+    ],
+    walls: [
+      { x1: 5.5, y1: 0.0, x2: 5.5, y2: 5.0 },
+      { x1: 10.5, y1: 0.0, x2: 10.5, y2: 5.0 },
+      { x1: 5.5, y1: 7.5, x2: 5.5, y2: 12.0 },
+      { x1: 10.5, y1: 7.5, x2: 10.5, y2: 12.0 },
     ],
   },
   maze: {
-    room_id: 'room_demo',
-    width: 12.0,
-    height: 10.0,
+    room_id: 'room_warehouse',
+    width: 22.0,
+    height: 16.0,
     anchors: [
-      { id: 'A1', x: 1.0, y: 1.0, online: true },
-      { id: 'A2', x: 11.0, y: 1.0, online: true },
-      { id: 'A3', x: 11.0, y: 9.0, online: true },
-      { id: 'A4', x: 1.0, y: 9.0, online: true },
+      { id: 'A1', x: 1.2, y: 1.2, online: true },
+      { id: 'A2', x: 20.8, y: 1.2, online: true },
+      { id: 'A3', x: 20.8, y: 14.8, online: true },
+      { id: 'A4', x: 1.2, y: 14.8, online: true },
+      { id: 'A5', x: 11.0, y: 1.2, online: true },
+      { id: 'A6', x: 11.0, y: 14.8, online: true },
     ],
     walls: [
-      { x1: 3.5, y1: 0.0, x2: 3.5, y2: 7.0 },
-      { x1: 6.5, y1: 3.0, x2: 6.5, y2: 10.0 },
-      { x1: 9.2, y1: 0.0, x2: 9.2, y2: 6.5 },
+      { x1: 6.5, y1: 0.0, x2: 6.5, y2: 11.0 },
+      { x1: 11.5, y1: 5.0, x2: 11.5, y2: 16.0 },
+      { x1: 16.5, y1: 0.0, x2: 16.5, y2: 11.0 },
     ],
   },
 };
@@ -823,6 +839,73 @@ export default function App() {
               />
             </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div className="control-group">
+                <div className="control-label">
+                  <span>Dynamic Room Width (X)</span>
+                  <span className="val">{layout.width.toFixed(1)} m</span>
+                </div>
+                <input
+                  type="range"
+                  min="8.0"
+                  max="24.0"
+                  step="1.0"
+                  value={layout.width}
+                  onChange={(e) => {
+                    const newW = parseFloat(e.target.value);
+                    const scaleX = newW / layout.width;
+                    const updated = {
+                      ...layout,
+                      width: newW,
+                      anchors: layout.anchors.map((a) => ({
+                        ...a,
+                        x: +(a.x * scaleX).toFixed(2),
+                      })),
+                      walls: layout.walls.map((w) => ({
+                        ...w,
+                        x1: +(w.x1 * scaleX).toFixed(2),
+                        x2: +(w.x2 * scaleX).toFixed(2),
+                      })),
+                    };
+                    setLayout(updated);
+                    sendCommand({ command: 'load_layout', layout: updated });
+                  }}
+                />
+              </div>
+              <div className="control-group">
+                <div className="control-label">
+                  <span>Dynamic Room Height (Y)</span>
+                  <span className="val">{layout.height.toFixed(1)} m</span>
+                </div>
+                <input
+                  type="range"
+                  min="6.0"
+                  max="18.0"
+                  step="1.0"
+                  value={layout.height}
+                  onChange={(e) => {
+                    const newH = parseFloat(e.target.value);
+                    const scaleY = newH / layout.height;
+                    const updated = {
+                      ...layout,
+                      height: newH,
+                      anchors: layout.anchors.map((a) => ({
+                        ...a,
+                        y: +(a.y * scaleY).toFixed(2),
+                      })),
+                      walls: layout.walls.map((w) => ({
+                        ...w,
+                        y1: +(w.y1 * scaleY).toFixed(2),
+                        y2: +(w.y2 * scaleY).toFixed(2),
+                      })),
+                    };
+                    setLayout(updated);
+                    sendCommand({ command: 'load_layout', layout: updated });
+                  }}
+                />
+              </div>
+            </div>
+
             <div className="control-label" style={{ marginTop: '4px' }}>
               <span>Click Anchors (or Drag on Map) to Toggle / Reposition:</span>
             </div>
@@ -864,7 +947,7 @@ export default function App() {
             </div>
 
             <div className="control-label" style={{ marginTop: '4px' }}>
-              <span>Floor Plan Presets &amp; Blackout Controls:</span>
+              <span>Multi-Scale Room Presets &amp; Blackout Controls:</span>
             </div>
             <div className="btn-row">
               <button
@@ -893,11 +976,19 @@ export default function App() {
               </button>
               <button
                 onClick={() => {
+                  setLayout(PRESET_LAYOUTS.clinic);
+                  sendCommand({ command: 'load_layout', layout: PRESET_LAYOUTS.clinic });
+                }}
+              >
+                Clinic (8m × 6m)
+              </button>
+              <button
+                onClick={() => {
                   setLayout(PRESET_LAYOUTS.hospital);
                   sendCommand({ command: 'load_layout', layout: PRESET_LAYOUTS.hospital });
                 }}
               >
-                Preset: Hospital (5 Anchors)
+                Hospital (16m × 12m, 5A)
               </button>
               <button
                 onClick={() => {
@@ -905,7 +996,7 @@ export default function App() {
                   sendCommand({ command: 'load_layout', layout: PRESET_LAYOUTS.maze });
                 }}
               >
-                Preset: Corridor Maze
+                Warehouse (22m × 16m, 6A)
               </button>
               <button
                 onClick={() => {
@@ -919,7 +1010,7 @@ export default function App() {
                   sendCommand({ command: 'reset', seed: 42 });
                 }}
               >
-                Reset Default
+                Reset Default (12m × 10m)
               </button>
             </div>
           </div>
