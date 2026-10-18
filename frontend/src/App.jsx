@@ -19,6 +19,44 @@ const DEFAULT_LAYOUT = {
   ],
 };
 
+const PRESET_LAYOUTS = {
+  default: DEFAULT_LAYOUT,
+  hospital: {
+    room_id: 'room_demo',
+    width: 12.0,
+    height: 10.0,
+    anchors: [
+      { id: 'A1', x: 1.0, y: 1.0, online: true },
+      { id: 'A2', x: 11.0, y: 1.0, online: true },
+      { id: 'A3', x: 11.0, y: 9.0, online: true },
+      { id: 'A4', x: 1.0, y: 9.0, online: true },
+      { id: 'A5', x: 6.0, y: 5.0, online: true },
+    ],
+    walls: [
+      { x1: 4.0, y1: 0.0, x2: 4.0, y2: 4.0 },
+      { x1: 8.0, y1: 0.0, x2: 8.0, y2: 4.0 },
+      { x1: 4.0, y1: 6.5, x2: 4.0, y2: 10.0 },
+      { x1: 8.0, y1: 6.5, x2: 8.0, y2: 10.0 },
+    ],
+  },
+  maze: {
+    room_id: 'room_demo',
+    width: 12.0,
+    height: 10.0,
+    anchors: [
+      { id: 'A1', x: 1.0, y: 1.0, online: true },
+      { id: 'A2', x: 11.0, y: 1.0, online: true },
+      { id: 'A3', x: 11.0, y: 9.0, online: true },
+      { id: 'A4', x: 1.0, y: 9.0, online: true },
+    ],
+    walls: [
+      { x1: 3.5, y1: 0.0, x2: 3.5, y2: 7.0 },
+      { x1: 6.5, y1: 3.0, x2: 6.5, y2: 10.0 },
+      { x1: 9.2, y1: 0.0, x2: 9.2, y2: 6.5 },
+    ],
+  },
+};
+
 export default function App() {
   const [connected, setConnected] = useState(false);
   const [frame, setFrame] = useState(null);
@@ -27,9 +65,11 @@ export default function App() {
   const [nlosBias, setNlosBias] = useState(2.5);
   const [showCompare, setShowCompare] = useState(true);
   const [showRadii, setShowRadii] = useState(true);
-  const [drawMode, setDrawMode] = useState('none'); // 'none' | 'wall' | 'anchor'
+  const [drawMode, setDrawMode] = useState('interact'); // 'interact' | 'wall' | 'anchor'
   const [dragStart, setDragStart] = useState(null);
   const [dragCurrent, setDragCurrent] = useState(null);
+  const [draggingAnchorId, setDraggingAnchorId] = useState(null);
+  const [anchorMoved, setAnchorMoved] = useState(false);
 
   const wsRef = useRef(null);
   const canvasRef = useRef(null);
@@ -320,7 +360,7 @@ export default function App() {
       ctx.setLineDash([]);
     }
 
-    // 7. Render Anchors
+    // 7. Render Anchors (Draggable & Clickable on Canvas)
     (layout.anchors || []).forEach((a) => {
       const sr =
         frame &&
@@ -332,13 +372,13 @@ export default function App() {
       const ay = toPxY(a.y);
 
       ctx.beginPath();
-      ctx.arc(ax, ay, 11, 0, Math.PI * 2);
+      ctx.arc(ax, ay, draggingAnchorId === a.id ? 14 : 11, 0, Math.PI * 2);
       if (!isOnline) ctx.fillStyle = '#334155';
       else if (isLiar) ctx.fillStyle = '#ef4444';
       else ctx.fillStyle = '#06b6d4';
       ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = draggingAnchorId === a.id ? 3 : 2;
+      ctx.strokeStyle = draggingAnchorId === a.id ? '#ffffff' : '#0f172a';
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
@@ -364,7 +404,6 @@ export default function App() {
       const tx = toPxX(frame.x);
       const ty = toPxY(frame.y);
 
-      // Fixed-size target marker (PPT Slide 6 specification)
       ctx.beginPath();
       ctx.arc(tx, ty, 8, 0, Math.PI * 2);
       ctx.fillStyle =
@@ -380,7 +419,6 @@ export default function App() {
       ctx.strokeStyle = '#ffffff';
       ctx.stroke();
 
-      // Callout label beside marker: "88% prob within 2m"
       const confPct = Math.round((frame.confidence_within_2m || 0.85) * 100);
       const calloutText = `${confPct}% within 2m (σ=${frame.sigma.toFixed(2)}m)`;
       ctx.font = '700 12px sans-serif';
@@ -397,9 +435,9 @@ export default function App() {
       ctx.fillStyle = '#f8fafc';
       ctx.fillText(calloutText, boxX, boxY);
     }
-  }, [frame, layout, showCompare, showRadii, drawMode, dragStart, dragCurrent]);
+  }, [frame, layout, showCompare, showRadii, drawMode, dragStart, dragCurrent, draggingAnchorId]);
 
-  // Interactive Canvas Handlers (Draw Wall or Add Anchor)
+  // Interactive Canvas Handlers (Drag Anchor, Click Anchor to Toggle, Draw Wall, Add Anchor)
   const getCanvasRoomCoords = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -407,11 +445,26 @@ export default function App() {
     const py = e.clientY - rect.top;
     const mx = +((px / rect.width) * layout.width).toFixed(2);
     const my = +(((rect.height - py) / rect.height) * layout.height).toFixed(2);
-    return { x: mx, y: my };
+    return {
+      x: Math.max(0.3, Math.min(layout.width - 0.3, mx)),
+      y: Math.max(0.3, Math.min(layout.height - 0.3, my)),
+    };
   };
 
   const handleCanvasMouseDown = (e) => {
     const pt = getCanvasRoomCoords(e);
+
+    // Check if user clicked on an existing anchor (within 0.65m radius)
+    const hitAnchor = (layout.anchors || []).find(
+      (a) => Math.hypot(a.x - pt.x, a.y - pt.y) < 0.65
+    );
+
+    if (hitAnchor && drawMode !== 'wall') {
+      setDraggingAnchorId(hitAnchor.id);
+      setAnchorMoved(false);
+      return;
+    }
+
     if (drawMode === 'wall') {
       setDragStart(pt);
       setDragCurrent(pt);
@@ -423,17 +476,51 @@ export default function App() {
       };
       setLayout(updated);
       sendCommand({ command: 'load_layout', layout: updated });
-      setDrawMode('none');
+      setDrawMode('interact');
     }
   };
 
   const handleCanvasMouseMove = (e) => {
+    const pt = getCanvasRoomCoords(e);
+    if (draggingAnchorId) {
+      setAnchorMoved(true);
+      setLayout((prev) => ({
+        ...prev,
+        anchors: prev.anchors.map((a) =>
+          a.id === draggingAnchorId ? { ...a, x: pt.x, y: pt.y } : a
+        ),
+      }));
+      return;
+    }
     if (drawMode === 'wall' && dragStart) {
-      setDragCurrent(getCanvasRoomCoords(e));
+      setDragCurrent(pt);
     }
   };
 
   const handleCanvasMouseUp = () => {
+    if (draggingAnchorId) {
+      const aid = draggingAnchorId;
+      setDraggingAnchorId(null);
+      if (anchorMoved) {
+        // Send updated anchor coordinates to backend & simulator
+        sendCommand({ command: 'load_layout', layout });
+      } else {
+        // Clicked anchor without dragging -> toggle online/offline!
+        const sr = (frame?.scored_readings || []).find((r) => r.anchor_id === aid);
+        const targetAnchor = layout.anchors.find((a) => a.id === aid);
+        const curOnline = sr ? sr.online : targetAnchor?.online ?? true;
+        const nextOnline = !curOnline;
+        setLayout((prev) => ({
+          ...prev,
+          anchors: prev.anchors.map((a) =>
+            a.id === aid ? { ...a, online: nextOnline } : a
+          ),
+        }));
+        sendCommand({ command: 'toggle_anchor', anchor_id: aid, online: nextOnline });
+      }
+      return;
+    }
+
     if (drawMode === 'wall' && dragStart && dragCurrent) {
       const dist = Math.hypot(dragCurrent.x - dragStart.x, dragCurrent.y - dragStart.y);
       if (dist > 0.4) {
@@ -549,32 +636,48 @@ export default function App() {
           <div className="card">
             <div className="card-header">
               <div className="card-title">
-                Live Map-Aware Belief-Region Heatmap &amp; Floor Plan ({layout.width}m × {layout.height}m)
+                Interactive Floor Plan &amp; Collapsing Belief Heatmap (Drag Anchors · Click Anchor to Toggle · Draw Walls)
               </div>
               <div className="btn-row">
+                <button
+                  className={drawMode === 'interact' ? 'active-mode' : ''}
+                  onClick={() => setDrawMode('interact')}
+                >
+                  ✋ Drag / Toggle Anchors
+                </button>
+                <button
+                  className={drawMode === 'wall' ? 'btn-amber' : ''}
+                  onClick={() => setDrawMode(drawMode === 'wall' ? 'interact' : 'wall')}
+                >
+                  {drawMode === 'wall' ? '✎ Drag on Map to Draw Wall...' : '+ Draw Wall on Map'}
+                </button>
+                <button
+                  className={drawMode === 'anchor' ? 'btn-amber' : ''}
+                  onClick={() => setDrawMode(drawMode === 'anchor' ? 'interact' : 'anchor')}
+                >
+                  {drawMode === 'anchor' ? '📍 Click Map to Place...' : '+ Add New Anchor'}
+                </button>
+                <button
+                  disabled={!layout.walls || layout.walls.length === 0}
+                  onClick={() => {
+                    const updated = { ...layout, walls: layout.walls.slice(0, -1) };
+                    setLayout(updated);
+                    sendCommand({ command: 'load_layout', layout: updated });
+                  }}
+                >
+                  ↶ Undo Wall
+                </button>
                 <button
                   className={showCompare ? 'active-mode' : ''}
                   onClick={() => setShowCompare(!showCompare)}
                 >
-                  {showCompare ? '✔ Naive Trilateration Shown' : 'Show Naive Trilateration'}
+                  {showCompare ? '✔ Naive Compare ON' : 'Naive Compare OFF'}
                 </button>
                 <button
                   className={showRadii ? 'active-mode' : ''}
                   onClick={() => setShowRadii(!showRadii)}
                 >
-                  {showRadii ? '✔ Range Circles Shown' : 'Show Range Circles'}
-                </button>
-                <button
-                  className={drawMode === 'wall' ? 'btn-amber' : ''}
-                  onClick={() => setDrawMode(drawMode === 'wall' ? 'none' : 'wall')}
-                >
-                  {drawMode === 'wall' ? '✎ Dragging Wall on Map...' : '+ Draw Wall on Map'}
-                </button>
-                <button
-                  className={drawMode === 'anchor' ? 'btn-amber' : ''}
-                  onClick={() => setDrawMode(drawMode === 'anchor' ? 'none' : 'anchor')}
-                >
-                  {drawMode === 'anchor' ? '📍 Click Map to Place...' : '+ Place Anchor'}
+                  {showRadii ? '✔ Circles ON' : 'Circles OFF'}
                 </button>
               </div>
             </div>
@@ -721,7 +824,7 @@ export default function App() {
             </div>
 
             <div className="control-label" style={{ marginTop: '4px' }}>
-              <span>Click Anchors to Toggle Online / Trigger Blind Spots:</span>
+              <span>Click Anchors (or Drag on Map) to Toggle / Reposition:</span>
             </div>
             <div className="anchor-grid">
               {(layout.anchors || []).map((a) => {
@@ -751,7 +854,7 @@ export default function App() {
                       });
                     }}
                   >
-                    <strong>{a.id}</strong>
+                    <strong>{a.id} ({a.x.toFixed(1)}, {a.y.toFixed(1)})</strong>
                     <span style={{ fontSize: '0.7rem' }}>
                       {!isOnline ? 'OFFLINE' : isLiar ? 'LIAR (NLOS)' : 'ONLINE'}
                     </span>
@@ -760,14 +863,17 @@ export default function App() {
               })}
             </div>
 
-            <div className="btn-row" style={{ marginTop: '4px' }}>
+            <div className="control-label" style={{ marginTop: '4px' }}>
+              <span>Floor Plan Presets &amp; Blackout Controls:</span>
+            </div>
+            <div className="btn-row">
               <button
                 className="btn-danger"
                 onClick={() =>
                   sendCommand({ command: 'trigger_blackout', blackout: true })
                 }
               >
-                ⚡ Trigger Full Blackout (Ghost Mode)
+                ⚡ Full Blackout (Ghost Mode)
               </button>
               <button
                 onClick={() =>
@@ -783,7 +889,23 @@ export default function App() {
                   sendCommand({ command: 'load_layout', layout: cleared });
                 }}
               >
-                Clear Walls
+                Clear All Walls
+              </button>
+              <button
+                onClick={() => {
+                  setLayout(PRESET_LAYOUTS.hospital);
+                  sendCommand({ command: 'load_layout', layout: PRESET_LAYOUTS.hospital });
+                }}
+              >
+                Preset: Hospital (5 Anchors)
+              </button>
+              <button
+                onClick={() => {
+                  setLayout(PRESET_LAYOUTS.maze);
+                  sendCommand({ command: 'load_layout', layout: PRESET_LAYOUTS.maze });
+                }}
+              >
+                Preset: Corridor Maze
               </button>
               <button
                 onClick={() => {
@@ -958,7 +1080,7 @@ export default function App() {
           </div>
           <div className="usp-card">
             <strong>08 Judge-Controlled Testing</strong>
-            Live wall drawing, NLOS/noise sliders, anchor toggles &amp; blackout.
+            Live wall drawing, NLOS/noise sliders, anchor dragging &amp; blackout.
           </div>
           <div className="usp-card">
             <strong>09 Failure Replay</strong>
