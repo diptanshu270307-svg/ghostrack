@@ -1,0 +1,26 @@
+{
+  "scenario": "Unseen 12x10m Room (NLOS bias=2.8m, noise=0.18m, 2.5s Full Blackout)",
+  "steps_evaluated": 300,
+  "naive_trilateration": {
+    "rmse_m": 1.795,
+    "median_p50_m": 1.549,
+    "p90_error_m": 3.136,
+    "availability_pct": 91.7
+  },
+  "geometric_filter_trilateration": {
+    "rmse_m": 1.218,
+    "median_p50_m": 0.227,
+    "p90_error_m": 3.021,
+    "availability_pct": 91.7
+  },
+  "ghosttrack_full_pipeline": {
+    "rmse_m": 0.845,
+    "median_p50_m": 0.281,
+    "p90_error_m": 1.689,
+    "availability_pct": 100.0
+  },
+  "calibration_usp03": {
+    "mean_predicted_prob_within_2m": 0.969,
+    "empirical_fraction_within_2m": 0.927
+  }
+}

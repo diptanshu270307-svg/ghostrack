@@ -1,108 +1,82 @@
-# InSight AI / GhostTrack: Resilient Indoor Positioning
+# InSight AI · GhostTrack — Resilient Indoor Positioning
 
-> **Resilient Indoor Positioning via Geometric Outlier Rejection and Predictive Dead-Reckoning**
-
-Indoor positioning with Bluetooth Low Energy (BLE) and Ultra-Wideband (UWB) suffers from three fatal modes of failure in real-world industrial and clinical deployments:
-1. **Signals Lie (Multipath / NLOS)**: Wall bounces make distance readings strictly longer than true distance, causing trilateration solutions to erratically jump.
-2. **Blind Spots (Coverage Gaps)**: With sparse or obstructed anchors, targets lose visibility to anchors, freezing conventional positioning systems.
-3. **Brittle ML (Overfitting to Noise)**: Deep learning models trained on raw signals fail in unseen room layouts and during intermittent network dropouts.
-
-**GhostTrack** solves these fundamental flaws using a robust, decoupled pipeline:
-- **01 Sensor Simulator**: High-fidelity RF ranging simulator with physical NLOS wall penetration models and synthetic IMU kinematics.
-- **02 Geometric Contradiction Engine**: Deterministic, zero-label geometric outlier rejection using intersecting circle consensus to identify and discard "liar" anchors before any neural inference.
-- **03 CNN-LSTM Tracker**: 1D temporal convolution smoothing coupled with LSTM trajectory momentum, trained with Huber loss for outlier-resilient coordinate regression and uncertainty estimation ($\sigma$).
-- **04 Ghost Mode (Inertial Dead-Reckoning)**: Predictive fallback when coverage is lost ($<2$ anchors), fusing the LSTM's momentum memory with high-rate IMU telemetry. Spatial uncertainty expands gracefully and snaps back to high confidence upon anchor re-acquisition.
-- **05 FastAPI & WebSockets**: Low-latency event streaming pushing position coordinates, variance, and 2D belief-region heatmaps.
-- **06 React Live Dashboard**: Real-time collapsing belief heatmaps, multi-anchor telemetry panels, and an interactive **Stress-Test Console** enabling judges to break tracking on purpose (inject massive noise, inject NLOS bias, disconnect anchors, draw custom room walls).
+**Team**: Kajukatli (Diptanshu Jamar)  
+**Tagline**: *Ambiguity-aware, explainable indoor positioning via geometric outlier rejection and predictive dead-reckoning.*
 
 ---
 
-## Architecture Overview
+## 1. The Problem: Why Standard Indoor Positioning Fails
+
+Bluetooth Low Energy (BLE) and Ultra-Wideband (UWB) indoor localization fail in three critical ways in real deployments (warehouses, hospitals, malls, robotics):
+1. **Signals Lie (NLOS Wall Bounces)**: Radio waves bounce off walls, making distance readings strictly longer than true distance and causing trilateration algorithms to jump erratically.
+2. **Blind Spots Freeze Tracking**: With sparse infrastructure, a target in a blind spot loses anchor coverage and conventional tracking freezes completely.
+3. **ML is Brittle**: End-to-end neural networks that memorize room-specific noise fail in unseen rooms and during network dropouts.
+
+---
+
+## 2. The GhostTrack Pipeline & 4 Explicit States
 
 ```mermaid
-flowchart TD
-    subgraph SENSORS ["Sensor Telemetry Layer"]
-        Sim["Sensor Simulator (Python)"]
-        IMU["IMU (ax, ay, gz)"]
-        RF["Anchor Distances (UWB/BLE)"]
-        Sim --> RF
-        Sim --> IMU
-    end
-
-    subgraph BROKER ["Message Broker"]
-        MQTT["Eclipse Mosquitto (MQTT 1883)"]
-        RF --> MQTT
-        IMU --> MQTT
-    end
-
-    subgraph ENGINE ["Pipeline Engine"]
-        Geo["01 Geometric Contradiction Engine\n(Consensus Residuals / Liar Rejection)"]
-        Tracker["02 CNN-LSTM Spatial Tracker\n(Temporal Conv1D + LSTM + Huber)"]
-        Ghost["03 Ghost Mode Dead-Reckoning\n(Kinematic Momentum + IMU Integration)"]
-        Belief["04 2D Belief Heatmap Generator\n(Spatial Probability Field)"]
-
-        MQTT --> Geo
-        Geo -- ">= 3 Clean Anchors" --> Tracker
-        Geo -- "< 2 Clean Anchors" --> Ghost
-        Tracker --> Belief
-        Ghost --> Belief
-    end
-
-    subgraph SERVING ["FastAPI & WebSockets"]
-        Backend["FastAPI App\n(/ws, /health, /layout)"]
-        Belief --> Backend
-    end
-
-    subgraph UI ["Interactive Dashboard"]
-        React["React (Vite) + Plotly/Canvas\n- Collapsing Belief Heatmap\n- Stress-Test Chaos Console\n- Naive vs GhostTrack Compare"]
-        Backend <--> React
-    end
+flowchart LR
+    Sim["01 Sensor Stream\nPython Simulator (MQTT 10Hz)\nRF Ranging + Mobile IMU"] --> Geo["02 Geometric Filter\nIntersecting Radii Consensus\nDownweights Liars + Keeps Evidence"]
+    Geo --> AI["03 Self-Trained AI + CNN-LSTM\nReading Scorer & Bias Estimator\n+ Conv1D + LSTM (Huber Loss)"]
+    AI --> Ghost["04 4-State Lifecycle & Adviser\nTracked · Ambiguous · Ghost · Lost\nControlled Recovery + Anchor Adviser"]
+    Ghost --> UI["05 React Live Dashboard\nMap-Aware Collapsing Belief Heatmap\nStress-Test Chaos Console"]
 ```
+
+### The 4 Tracking States
+- **`Tracked`**: $\ge 3$ geometrically consistent anchors; verified fix with sharp belief lock.
+- **`Ambiguous`**: Only 2 clean anchors visible (bimodal circle intersection) or unverified post-blackout recovery; the heatmap preserves **multiple plausible regions** rather than guessing blindly.
+- **`Ghost`**: Zero/insufficient anchors visible; fuses **LSTM momentum memory** with **mobile IMU ($a_x, a_y, g_z$)** while spatial uncertainty ($\sigma$) widens monotonically.
+- **`Lost`**: If a full blackout exceeds the timeout threshold ($5.0\text{ s}$), stops inventing a fictional path and explicitly transitions to `Lost`.
 
 ---
 
-## Repository Structure
+## 3. All 12 PPT USPs Implemented
 
-```
-├── .env.example              # Environment variables template
-├── docker-compose.yml        # Mosquitto broker setup
-├── requirements.txt          # Python dependencies
-├── package.json              # Monorepo scripts
-├── run_demo.sh               # One-command demo runner (macOS/Linux)
-├── run_demo.bat              # One-command demo runner (Windows)
-├── docs/
-│   └── contracts.md          # Strict MQTT and WebSocket data contracts
-├── shared/
-│   ├── __init__.py
-│   └── schemas.py            # Pydantic data schemas
-├── simulator/
-│   ├── __init__.py
-│   ├── geometry.py           # 2D segment intersection and collision physics
-│   ├── trajectory.py         # Smooth kinematics and noisy IMU simulation
-│   └── sim.py                # Main MQTT simulator & dataset exporter
-├── engine/                   # Geometric Contradiction Engine
-├── model/                    # CNN-LSTM Tracker & Ghost Mode
-├── backend/                  # FastAPI WebSocket & REST streaming service
-├── frontend/                 # React + Vite interactive dashboard
-├── scripts/
-│   └── embedded_broker.py    # Zero-dependency fallback MQTT broker
-└── tests/
-    ├── test_contracts.py
-    └── test_simulator.py
-```
+| USP | Feature | Implementation |
+|---|---|---|
+| **01** | **Ambiguity-Aware Tracking** | Computes exact bimodal circle intersections in [`engine/contradiction.py`](file:///Users/diptanshujamar/Documents/codeapex/engine/contradiction.py) and renders multi-modal lobes in [`backend/belief.py`](file:///Users/diptanshujamar/Documents/codeapex/backend/belief.py). |
+| **02** | **Explainable Anchor Recovery** | [`engine/adviser.py`](file:///Users/diptanshujamar/Documents/codeapex/engine/adviser.py) ranks offline/NLOS anchors by symmetry-breaking gain & GDOP reduction with 1-click restoration in the UI. |
+| **03** | **Measured Reliability** | Displays calibrated `"X% probability within 2 m"` beside the fixed-size target marker and validates empirical coverage in [`scripts/train_and_evaluate.py`](file:///Users/diptanshujamar/Documents/codeapex/scripts/train_and_evaluate.py). |
+| **04** | **Sensor Diagnostics** | Keeps all readings with continuous reliability weights $w \in [0, 1]$, AI bias estimates, and highlights suspicious NLOS links in red on the floor plan. |
+| **05** | **Ghost Mode, Visible Limits** | Short-term LSTM + IMU dead-reckoning with growing $\sigma(t)$ that transitions to `Lost` after prolonged blackout in [`model/ghost.py`](file:///Users/diptanshujamar/Documents/codeapex/model/ghost.py). |
+| **06** | **Controlled Recovery** | Returning anchor fixes must pass consecutive consistency verification frames before transitioning back to `Tracked`. |
+| **07** | **Map-Aware Tracking** | Interior floor-plan walls block impossible moves during dead-reckoning and mask the 2D belief heatmap. |
+| **08** | **Judge-Controlled Testing** | Live Stress-Test Console: draw custom walls on the map, place anchors, drag NLOS/noise sliders, toggle anchors, or trigger a full blackout. |
+| **09** | **Failure Replay** | Simultaneously runs and benchmarks **Naive Trilateration**, **Geometric Filter**, and **GhostTrack** on identical telemetry streams. |
+| **10** | **Freshness-Aware Tracking** | Tracks per-packet measurement age (`measurement_age_ms`) and exponentially decays weights of stale packets. |
+| **11** | **Auditable Decisions** | Real-time scrolling audit log recording every state transition, liar downweight reason, recovery verification, and adviser update. |
+| **12** | **Local, No-Cloud Operation** | Runs 100% locally with one command (`./run_demo.sh`), including an embedded Python MQTT broker fallback if Mosquitto/Docker isn't installed. |
 
 ---
 
-## Quickstart (One Command)
+## 4. Quickstart (One Command)
 
-### macOS / Linux
+### Run the Full Live Demo (MQTT Broker + Simulator + FastAPI Backend + React Dashboard)
 ```bash
 ./run_demo.sh
 ```
+*(On Windows: `run_demo.bat`)*
 
-### Windows
-```cmd
-run_demo.bat
+Then open **`http://localhost:5173`** in your browser.
+
+### Run the Automated Test Suite
+```bash
+.venv/bin/pytest tests/ -v
 ```
 
-The runner automatically verifies Python `.venv`, starts the MQTT broker (local binary, Docker, or embedded fallback), launches the FastAPI backend and simulator, and starts the Vite React dashboard at `http://localhost:5173`.
+### Train Self-Trained AI Models & Run Unseen-Room Benchmark
+```bash
+.venv/bin/python -m scripts.train_and_evaluate
+```
+*(Saves trained weights to `model/weights/` and real measured metrics to `data/evaluation_report.json`.)*
+
+---
+
+## 5. Live Hackathon Demo Script for Judges (90 Seconds)
+
+1. **Normal Tracking (`Tracked`)**: Point out the collapsing emerald belief heatmap, the fixed-size target dot with its `"~94% within 2m"` callout, and the red dashed NLOS link whenever the target passes behind an interior wall.
+2. **Signals Lie (Inject NLOS Bias)**: Drag the **NLOS Wall-Bounce Bias** slider up to `+4.5 m`. Show how the red **Naive Trilateration** dot jumps wildly across the room while **GhostTrack** downweights the liar (`w < 0.15`) and stays locked on the true path.
+3. **Ambiguity-Aware Tracking (`Ambiguous`)**: Click two anchors (`A3` and `A4`) to turn them **OFFLINE**. Watch the state switch to **`Ambiguous`** with two yellow bimodal modes, and point to the **Explainable Anchor Recovery Adviser** recommending which anchor to restore first and why.
+4. **Blackout $\rightarrow$ `Ghost` $\rightarrow$ `Lost` $\rightarrow$ `Controlled Recovery`**: Click **⚡ Trigger Full Blackout**. Watch the heatmap turn purple and expand as **Ghost Mode** dead-reckons with LSTM + IMU, transition to **`Lost`** after 5 seconds, and then click **↺ Restore All Anchors** (or click the **▶ Run Scripted Chaos Scenario** button) to show **Controlled Recovery** verifying the fix before locking back onto `Tracked`.
