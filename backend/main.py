@@ -591,3 +591,33 @@ async def websocket_endpoint(websocket: WebSocket):
         pipeline_service.clients.discard(websocket)
     except Exception:
         pipeline_service.clients.discard(websocket)
+
+
+# Mount built frontend if available (e.g. for single-container Cloud Run deployment)
+FRONTEND_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+
+if os.path.exists(FRONTEND_DIST):
+    from fastapi.staticfiles import StaticFiles
+    from starlette.responses import FileResponse
+
+    assets_dir = os.path.join(FRONTEND_DIST, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path in ("health", "config", "metrics", "layout", "docs", "openapi.json"):
+            return None
+        candidate = os.path.join(FRONTEND_DIST, full_path)
+        if full_path and os.path.isfile(candidate):
+            return FileResponse(candidate)
+        index_file = os.path.join(FRONTEND_DIST, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"status": "ok", "message": "GhostTrack API is running"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, log_level="info")

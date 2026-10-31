@@ -70,7 +70,22 @@ Then open **`http://localhost:5173`** in your browser.
 ```bash
 .venv/bin/python -m scripts.train_and_evaluate
 ```
-*(Saves trained weights to `model/weights/` and real measured metrics to `data/evaluation_report.json`.)*
+### Deploy to Google Cloud (Cloud Run)
+```bash
+./deploy_gcp.sh
+```
+*Or directly via `gcloud`:*
+```bash
+gcloud run deploy ghosttrack \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --memory 1Gi \
+  --cpu 1 \
+  --timeout 3600 \
+  --session-affinity
+```
+This automatically builds the React dashboard and Python container in Google Cloud and deploys a live HTTPS endpoint with native WebSocket streaming.
 
 ---
 

@@ -1,7 +1,34 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-const WS_URL = import.meta.env.VITE_BACKEND_WS_URL || 'ws://127.0.0.1:8000/ws';
-const HTTP_URL = import.meta.env.VITE_BACKEND_HTTP_URL || 'http://127.0.0.1:8000';
+const getWsUrl = () => {
+  if (import.meta.env.VITE_BACKEND_WS_URL) {
+    return import.meta.env.VITE_BACKEND_WS_URL;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.port === '5173') {
+      return 'ws://127.0.0.1:8000/ws';
+    }
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${proto}//${window.location.host}/ws`;
+  }
+  return 'ws://127.0.0.1:8000/ws';
+};
+
+const getHttpUrl = () => {
+  if (import.meta.env.VITE_BACKEND_HTTP_URL) {
+    return import.meta.env.VITE_BACKEND_HTTP_URL;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.port === '5173') {
+      return 'http://127.0.0.1:8000';
+    }
+    return window.location.origin;
+  }
+  return 'http://127.0.0.1:8000';
+};
+
+const WS_URL = getWsUrl();
+const HTTP_URL = getHttpUrl();
 
 const DEFAULT_LAYOUT = {
   room_id: 'room_demo',
