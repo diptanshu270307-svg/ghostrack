@@ -1,0 +1,2790 @@
+{
+  "room": {
+    "width": 12.0,
+    "height": 10.0
+  },
+  "anchors": [
+    {
+      "id": "A1",
+      "x": 1.0,
+      "y": 1.0
+    },
+    {
+      "id": "A2",
+      "x": 11.0,
+      "y": 1.0
+    },
+    {
+      "id": "A3",
+      "x": 11.0,
+      "y": 9.0
+    },
+    {
+      "id": "A4",
+      "x": 1.0,
+      "y": 9.0
+    }
+  ],
+  "trajectory": [
+    {
+      "step": 0,
+      "time_s": 0.0,
+      "true_x": 3.0,
+      "true_y": 2.5,
+      "dr_drift_x": 3.208,
+      "dr_drift_y": 2.506,
+      "imu": {
+        "ax": 0.099,
+        "ay": 0.017
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 2.419,
+          "true_distance": 2.5,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.018,
+          "true_distance": 8.139,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 10.216,
+          "true_distance": 10.308,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.695,
+          "true_distance": 6.801,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 1,
+      "time_s": 0.2,
+      "true_x": 3.204,
+      "true_y": 2.506,
+      "dr_drift_x": 3.419,
+      "dr_drift_y": 2.515,
+      "imu": {
+        "ax": 0.086,
+        "ay": 0.051
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 2.621,
+          "true_distance": 2.669,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.914,
+          "true_distance": 7.94,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 10.243,
+          "true_distance": 10.147,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.897,
+          "true_distance": 6.858,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "time_s": 0.4,
+      "true_x": 3.406,
+      "true_y": 2.523,
+      "dr_drift_x": 3.629,
+      "dr_drift_y": 2.531,
+      "imu": {
+        "ax": -0.036,
+        "ay": 0.202
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 2.767,
+          "true_distance": 2.848,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.927,
+          "true_distance": 7.745,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 10.019,
+          "true_distance": 9.981,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.929,
+          "true_distance": 6.91,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "time_s": 0.6,
+      "true_x": 3.606,
+      "true_y": 2.551,
+      "dr_drift_x": 3.841,
+      "dr_drift_y": 2.553,
+      "imu": {
+        "ax": 0.056,
+        "ay": 0.143
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 3.131,
+          "true_distance": 3.032,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.54,
+          "true_distance": 7.555,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 9.615,
+          "true_distance": 9.812,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.081,
+          "true_distance": 6.956,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "time_s": 0.8,
+      "true_x": 3.801,
+      "true_y": 2.59,
+      "dr_drift_x": 4.05,
+      "dr_drift_y": 2.578,
+      "imu": {
+        "ax": -0.076,
+        "ay": 0.056
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 3.084,
+          "true_distance": 3.221,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.978,
+          "true_distance": 7.373,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 9.703,
+          "true_distance": 9.639,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.047,
+          "true_distance": 6.995,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "time_s": 1.0,
+      "true_x": 3.991,
+      "true_y": 2.641,
+      "dr_drift_x": 4.255,
+      "dr_drift_y": 2.608,
+      "imu": {
+        "ax": -0.088,
+        "ay": 0.14
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 3.568,
+          "true_distance": 3.411,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.005,
+          "true_distance": 7.199,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 9.38,
+          "true_distance": 9.464,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.114,
+          "true_distance": 7.027,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "time_s": 1.2,
+      "true_x": 4.173,
+      "true_y": 2.702,
+      "dr_drift_x": 4.455,
+      "dr_drift_y": 2.641,
+      "imu": {
+        "ax": -0.13,
+        "ay": 0.073
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 3.63,
+          "true_distance": 3.601,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.115,
+          "true_distance": 7.036,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 9.322,
+          "true_distance": 9.288,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.912,
+          "true_distance": 7.052,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "time_s": 1.4,
+      "true_x": 4.348,
+      "true_y": 2.775,
+      "dr_drift_x": 4.647,
+      "dr_drift_y": 2.676,
+      "imu": {
+        "ax": -0.205,
+        "ay": 0.065
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 3.896,
+          "true_distance": 3.789,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.839,
+          "true_distance": 6.885,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 9.201,
+          "true_distance": 9.111,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.004,
+          "true_distance": 7.068,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "time_s": 1.6,
+      "true_x": 4.513,
+      "true_y": 2.857,
+      "dr_drift_x": 4.833,
+      "dr_drift_y": 2.718,
+      "imu": {
+        "ax": -0.167,
+        "ay": 0.155
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.09,
+          "true_distance": 3.974,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.632,
+          "true_distance": 6.747,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.958,
+          "true_distance": 8.934,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.11,
+          "true_distance": 7.076,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "time_s": 1.8,
+      "true_x": 4.668,
+      "true_y": 2.951,
+      "dr_drift_x": 5.011,
+      "dr_drift_y": 2.763,
+      "imu": {
+        "ax": -0.19,
+        "ay": 0.081
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.294,
+          "true_distance": 4.155,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.633,
+          "true_distance": 6.625,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.573,
+          "true_distance": 8.757,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.201,
+          "true_distance": 7.075,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "time_s": 2.0,
+      "true_x": 4.812,
+      "true_y": 3.054,
+      "dr_drift_x": 5.183,
+      "dr_drift_y": 2.814,
+      "imu": {
+        "ax": -0.121,
+        "ay": 0.145
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.406,
+          "true_distance": 4.33,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.44,
+          "true_distance": 6.52,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.476,
+          "true_distance": 8.582,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.97,
+          "true_distance": 7.063,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "time_s": 2.2,
+      "true_x": 4.945,
+      "true_y": 3.167,
+      "dr_drift_x": 5.346,
+      "dr_drift_y": 2.867,
+      "imu": {
+        "ax": -0.252,
+        "ay": 0.057
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.429,
+          "true_distance": 4.5,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.457,
+          "true_distance": 6.431,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.3,
+          "true_distance": 8.408,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.087,
+          "true_distance": 7.042,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "time_s": 2.4,
+      "true_x": 5.064,
+      "true_y": 3.289,
+      "dr_drift_x": 5.498,
+      "dr_drift_y": 2.923,
+      "imu": {
+        "ax": -0.273,
+        "ay": 0.082
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.509,
+          "true_distance": 4.665,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.453,
+          "true_distance": 6.362,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.228,
+          "true_distance": 8.237,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.113,
+          "true_distance": 7.009,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "time_s": 2.6,
+      "true_x": 5.171,
+      "true_y": 3.421,
+      "dr_drift_x": 5.64,
+      "dr_drift_y": 2.984,
+      "imu": {
+        "ax": -0.251,
+        "ay": 0.107
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.57,
+          "true_distance": 4.822,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.339,
+          "true_distance": 6.312,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 8.044,
+          "true_distance": 8.069,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.941,
+          "true_distance": 6.966,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "time_s": 2.8,
+      "true_x": 5.264,
+      "true_y": 3.561,
+      "dr_drift_x": 5.773,
+      "dr_drift_y": 3.048,
+      "imu": {
+        "ax": -0.208,
+        "ay": 0.07
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 4.99,
+          "true_distance": 4.974,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.416,
+          "true_distance": 6.282,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.848,
+          "true_distance": 7.905,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.909,
+          "true_distance": 6.911,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "time_s": 3.0,
+      "true_x": 5.344,
+      "true_y": 3.709,
+      "dr_drift_x": 5.899,
+      "dr_drift_y": 3.113,
+      "imu": {
+        "ax": -0.191,
+        "ay": 0.045
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.078,
+          "true_distance": 5.119,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.225,
+          "true_distance": 6.272,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.763,
+          "true_distance": 7.745,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.941,
+          "true_distance": 6.845,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "time_s": 3.2,
+      "true_x": 5.41,
+      "true_y": 3.866,
+      "dr_drift_x": 6.013,
+      "dr_drift_y": 3.181,
+      "imu": {
+        "ax": -0.314,
+        "ay": 0.077
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.281,
+          "true_distance": 5.259,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.894,
+          "true_distance": 6.282,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.569,
+          "true_distance": 7.59,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.681,
+          "true_distance": 6.768,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "time_s": 3.4,
+      "true_x": 5.462,
+      "true_y": 4.03,
+      "dr_drift_x": 6.116,
+      "dr_drift_y": 3.252,
+      "imu": {
+        "ax": -0.258,
+        "ay": 0.056
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.305,
+          "true_distance": 5.394,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.917,
+          "true_distance": 6.312,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.183,
+          "true_distance": 7.441,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.706,
+          "true_distance": 6.679,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "time_s": 3.6,
+      "true_x": 5.502,
+      "true_y": 4.201,
+      "dr_drift_x": 6.208,
+      "dr_drift_y": 3.323,
+      "imu": {
+        "ax": -0.269,
+        "ay": 0.011
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.58,
+          "true_distance": 5.524,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.155,
+          "true_distance": 6.362,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.394,
+          "true_distance": 7.298,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.546,
+          "true_distance": 6.58,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "time_s": 3.8,
+      "true_x": 5.528,
+      "true_y": 4.378,
+      "dr_drift_x": 6.292,
+      "dr_drift_y": 3.397,
+      "imu": {
+        "ax": -0.193,
+        "ay": 0.089
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.577,
+          "true_distance": 5.65,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.282,
+          "true_distance": 6.431,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.294,
+          "true_distance": 7.162,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.556,
+          "true_distance": 6.47,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "time_s": 4.0,
+      "true_x": 5.543,
+      "true_y": 4.562,
+      "dr_drift_x": 6.367,
+      "dr_drift_y": 3.472,
+      "imu": {
+        "ax": -0.237,
+        "ay": 0.012
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.836,
+          "true_distance": 5.773,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.34,
+          "true_distance": 6.517,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 7.138,
+          "true_distance": 7.034,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.423,
+          "true_distance": 6.351,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 21,
+      "time_s": 4.2,
+      "true_x": 5.546,
+      "true_y": 4.751,
+      "dr_drift_x": 6.435,
+      "dr_drift_y": 3.549,
+      "imu": {
+        "ax": -0.193,
+        "ay": 0.042
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.804,
+          "true_distance": 5.893,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.451,
+          "true_distance": 6.62,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.929,
+          "true_distance": 6.914,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.143,
+          "true_distance": 6.222,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 22,
+      "time_s": 4.4,
+      "true_x": 5.538,
+      "true_y": 4.945,
+      "dr_drift_x": 6.496,
+      "dr_drift_y": 3.627,
+      "imu": {
+        "ax": -0.158,
+        "ay": 0.02
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 5.896,
+          "true_distance": 6.013,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.631,
+          "true_distance": 6.738,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.784,
+          "true_distance": 6.803,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.186,
+          "true_distance": 6.086,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 23,
+      "time_s": 4.6,
+      "true_x": 5.52,
+      "true_y": 5.143,
+      "dr_drift_x": 6.551,
+      "dr_drift_y": 3.703,
+      "imu": {
+        "ax": -0.153,
+        "ay": -0.025
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.325,
+          "true_distance": 6.132,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.535,
+          "true_distance": 6.87,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.853,
+          "true_distance": 6.701,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.96,
+          "true_distance": 5.942,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 24,
+      "time_s": 4.8,
+      "true_x": 5.494,
+      "true_y": 5.345,
+      "dr_drift_x": 6.602,
+      "dr_drift_y": 3.778,
+      "imu": {
+        "ax": -0.101,
+        "ay": -0.041
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.182,
+          "true_distance": 6.251,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.912,
+          "true_distance": 7.014,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.739,
+          "true_distance": 6.609,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.809,
+          "true_distance": 5.792,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 25,
+      "time_s": 5.0,
+      "true_x": 5.46,
+      "true_y": 5.551,
+      "dr_drift_x": 6.649,
+      "dr_drift_y": 3.851,
+      "imu": {
+        "ax": -0.075,
+        "ay": -0.041
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.218,
+          "true_distance": 6.372,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.912,
+          "true_distance": 7.169,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.395,
+          "true_distance": 6.526,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.693,
+          "true_distance": 5.638,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 26,
+      "time_s": 5.2,
+      "true_x": 5.42,
+      "true_y": 5.759,
+      "dr_drift_x": 6.695,
+      "dr_drift_y": 3.922,
+      "imu": {
+        "ax": -0.061,
+        "ay": -0.07
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.611,
+          "true_distance": 6.495,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.144,
+          "true_distance": 7.334,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.409,
+          "true_distance": 6.453,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.417,
+          "true_distance": 5.481,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 27,
+      "time_s": 5.4,
+      "true_x": 5.375,
+      "true_y": 5.969,
+      "dr_drift_x": 6.741,
+      "dr_drift_y": 3.987,
+      "imu": {
+        "ax": 0.009,
+        "ay": -0.138
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.776,
+          "true_distance": 6.621,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.381,
+          "true_distance": 7.505,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.362,
+          "true_distance": 6.39,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.197,
+          "true_distance": 5.322,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 28,
+      "time_s": 5.6,
+      "true_x": 5.326,
+      "true_y": 6.181,
+      "dr_drift_x": 6.791,
+      "dr_drift_y": 4.048,
+      "imu": {
+        "ax": 0.116,
+        "ay": -0.103
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.667,
+          "true_distance": 6.75,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.53,
+          "true_distance": 7.683,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.148,
+          "true_distance": 6.335,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.297,
+          "true_distance": 5.164,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 29,
+      "time_s": 5.8,
+      "true_x": 5.276,
+      "true_y": 6.394,
+      "dr_drift_x": 6.841,
+      "dr_drift_y": 4.105,
+      "imu": {
+        "ax": -0.014,
+        "ay": -0.079
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 6.932,
+          "true_distance": 6.883,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.59,
+          "true_distance": 7.865,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.431,
+          "true_distance": 6.29,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.962,
+          "true_distance": 5.008,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 30,
+      "time_s": 6.0,
+      "true_x": 5.224,
+      "true_y": 6.606,
+      "dr_drift_x": 6.894,
+      "dr_drift_y": 4.157,
+      "imu": {
+        "ax": 0.083,
+        "ay": -0.139
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.177,
+          "true_distance": 7.02,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.772,
+          "true_distance": 8.049,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.246,
+          "true_distance": 6.252,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.922,
+          "true_distance": 4.855,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 31,
+      "time_s": 6.2,
+      "true_x": 5.174,
+      "true_y": 6.819,
+      "dr_drift_x": 6.953,
+      "dr_drift_y": 4.202,
+      "imu": {
+        "ax": 0.137,
+        "ay": -0.196
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.103,
+          "true_distance": 7.161,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.992,
+          "true_distance": 8.235,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.182,
+          "true_distance": 6.221,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.645,
+          "true_distance": 4.709,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 32,
+      "time_s": 6.4,
+      "true_x": 5.125,
+      "true_y": 7.031,
+      "dr_drift_x": 7.022,
+      "dr_drift_y": 4.239,
+      "imu": {
+        "ax": 0.261,
+        "ay": -0.162
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.12,
+          "true_distance": 7.307,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.239,
+          "true_distance": 8.419,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.117,
+          "true_distance": 6.196,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.628,
+          "true_distance": 4.571,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 33,
+      "time_s": 6.6,
+      "true_x": 5.08,
+      "true_y": 7.241,
+      "dr_drift_x": 7.099,
+      "dr_drift_y": 4.272,
+      "imu": {
+        "ax": 0.194,
+        "ay": -0.138
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.434,
+          "true_distance": 7.456,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.308,
+          "true_distance": 8.602,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.129,
+          "true_distance": 6.176,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.344,
+          "true_distance": 4.443,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 34,
+      "time_s": 6.8,
+      "true_x": 5.04,
+      "true_y": 7.449,
+      "dr_drift_x": 7.185,
+      "dr_drift_y": 4.299,
+      "imu": {
+        "ax": 0.242,
+        "ay": -0.115
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.84,
+          "true_distance": 7.61,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.606,
+          "true_distance": 8.782,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.026,
+          "true_distance": 6.159,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.388,
+          "true_distance": 4.327,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 35,
+      "time_s": 7.0,
+      "true_x": 5.006,
+      "true_y": 7.655,
+      "dr_drift_x": 7.281,
+      "dr_drift_y": 4.318,
+      "imu": {
+        "ax": 0.237,
+        "ay": -0.232
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.807,
+          "true_distance": 7.768,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.8,
+          "true_distance": 8.956,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.191,
+          "true_distance": 6.143,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.305,
+          "true_distance": 4.226,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 36,
+      "time_s": 7.2,
+      "true_x": 4.98,
+      "true_y": 7.857,
+      "dr_drift_x": 7.39,
+      "dr_drift_y": 4.325,
+      "imu": {
+        "ax": 0.32,
+        "ay": -0.275
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 7.939,
+          "true_distance": 7.928,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.057,
+          "true_distance": 9.125,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.011,
+          "true_distance": 6.128,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.198,
+          "true_distance": 4.141,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 37,
+      "time_s": 7.4,
+      "true_x": 4.962,
+      "true_y": 8.055,
+      "dr_drift_x": 7.511,
+      "dr_drift_y": 4.322,
+      "imu": {
+        "ax": 0.306,
+        "ay": -0.249
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.124,
+          "true_distance": 8.092,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.958,
+          "true_distance": 9.286,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.039,
+          "true_distance": 6.111,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.08,
+          "true_distance": 4.073,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 38,
+      "time_s": 7.6,
+      "true_x": 4.954,
+      "true_y": 8.249,
+      "dr_drift_x": 7.644,
+      "dr_drift_y": 4.31,
+      "imu": {
+        "ax": 0.309,
+        "ay": -0.246
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.234,
+          "true_distance": 8.258,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.1,
+          "true_distance": 9.439,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.991,
+          "true_distance": 6.092,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.055,
+          "true_distance": 4.025,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 39,
+      "time_s": 7.8,
+      "true_x": 4.957,
+      "true_y": 8.438,
+      "dr_drift_x": 7.79,
+      "dr_drift_y": 4.287,
+      "imu": {
+        "ax": 0.302,
+        "ay": -0.254
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.48,
+          "true_distance": 8.425,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.366,
+          "true_distance": 9.583,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.183,
+          "true_distance": 6.069,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 3.867,
+          "true_distance": 3.997,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 40,
+      "time_s": 8.0,
+      "true_x": 4.972,
+      "true_y": 8.622,
+      "dr_drift_x": 7.949,
+      "dr_drift_y": 4.257,
+      "imu": {
+        "ax": 0.356,
+        "ay": -0.187
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.549,
+          "true_distance": 8.594,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.52,
+          "true_distance": 9.718,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.942,
+          "true_distance": 6.04,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 3.916,
+          "true_distance": 3.99,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 41,
+      "time_s": 8.2,
+      "true_x": 4.998,
+      "true_y": 8.799,
+      "dr_drift_x": 8.123,
+      "dr_drift_y": 4.217,
+      "imu": {
+        "ax": 0.344,
+        "ay": -0.263
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 8.866,
+          "true_distance": 8.764,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.702,
+          "true_distance": 9.841,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.09,
+          "true_distance": 6.005,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.084,
+          "true_distance": 4.003,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 42,
+      "time_s": 8.4,
+      "true_x": 5.038,
+      "true_y": 8.97,
+      "dr_drift_x": 8.311,
+      "dr_drift_y": 4.164,
+      "imu": {
+        "ax": 0.354,
+        "ay": -0.303
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.033,
+          "true_distance": 8.934,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.698,
+          "true_distance": 9.953,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.844,
+          "true_distance": 5.962,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.082,
+          "true_distance": 4.038,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 43,
+      "time_s": 8.6,
+      "true_x": 5.09,
+      "true_y": 9.134,
+      "dr_drift_x": 8.516,
+      "dr_drift_y": 4.096,
+      "imu": {
+        "ax": 0.44,
+        "ay": -0.378
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.095,
+          "true_distance": 9.105,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.739,
+          "true_distance": 10.054,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.053,
+          "true_distance": 5.911,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.064,
+          "true_distance": 4.092,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 44,
+      "time_s": 8.8,
+      "true_x": 5.156,
+      "true_y": 9.291,
+      "dr_drift_x": 8.738,
+      "dr_drift_y": 4.013,
+      "imu": {
+        "ax": 0.414,
+        "ay": -0.375
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.341,
+          "true_distance": 9.274,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.885,
+          "true_distance": 10.143,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.908,
+          "true_distance": 5.851,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.156,
+          "true_distance": 4.166,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 45,
+      "time_s": 9.0,
+      "true_x": 5.236,
+      "true_y": 9.439,
+      "dr_drift_x": 8.976,
+      "dr_drift_y": 3.917,
+      "imu": {
+        "ax": 0.424,
+        "ay": -0.336
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.145,
+          "true_distance": 9.443,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 12.892,
+          "true_distance": 10.22,
+          "is_nlos": true
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.833,
+          "true_distance": 5.781,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.274,
+          "true_distance": 4.259,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 46,
+      "time_s": 9.2,
+      "true_x": 5.329,
+      "true_y": 9.579,
+      "dr_drift_x": 9.232,
+      "dr_drift_y": 3.803,
+      "imu": {
+        "ax": 0.423,
+        "ay": -0.437
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.701,
+          "true_distance": 9.61,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.266,
+          "true_distance": 10.284,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.614,
+          "true_distance": 5.7,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.261,
+          "true_distance": 4.368,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 47,
+      "time_s": 9.4,
+      "true_x": 5.436,
+      "true_y": 9.711,
+      "dr_drift_x": 9.502,
+      "dr_drift_y": 3.678,
+      "imu": {
+        "ax": 0.366,
+        "ay": -0.296
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 9.646,
+          "true_distance": 9.775,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.375,
+          "true_distance": 10.336,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.691,
+          "true_distance": 5.609,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.283,
+          "true_distance": 4.492,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 48,
+      "time_s": 9.6,
+      "true_x": 5.555,
+      "true_y": 9.833,
+      "dr_drift_x": 9.788,
+      "dr_drift_y": 3.54,
+      "imu": {
+        "ax": 0.382,
+        "ay": -0.319
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.038,
+          "true_distance": 9.939,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.352,
+          "true_distance": 10.376,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.592,
+          "true_distance": 5.508,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.839,
+          "true_distance": 4.631,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 49,
+      "time_s": 9.8,
+      "true_x": 5.688,
+      "true_y": 9.946,
+      "dr_drift_x": 10.088,
+      "dr_drift_y": 3.386,
+      "imu": {
+        "ax": 0.357,
+        "ay": -0.384
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.18,
+          "true_distance": 10.1,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.299,
+          "true_distance": 10.405,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.339,
+          "true_distance": 5.396,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.774,
+          "true_distance": 4.782,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 50,
+      "time_s": 10.0,
+      "true_x": 5.832,
+      "true_y": 10.049,
+      "dr_drift_x": 10.4,
+      "dr_drift_y": 3.219,
+      "imu": {
+        "ax": 0.32,
+        "ay": -0.342
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.392,
+          "true_distance": 10.258,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.519,
+          "true_distance": 10.421,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.312,
+          "true_distance": 5.274,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.868,
+          "true_distance": 4.944,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 51,
+      "time_s": 10.2,
+      "true_x": 5.987,
+      "true_y": 10.143,
+      "dr_drift_x": 10.726,
+      "dr_drift_y": 3.037,
+      "imu": {
+        "ax": 0.316,
+        "ay": -0.36
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.461,
+          "true_distance": 10.414,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.449,
+          "true_distance": 10.427,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.351,
+          "true_distance": 5.142,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.276,
+          "true_distance": 5.116,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 52,
+      "time_s": 10.4,
+      "true_x": 6.152,
+      "true_y": 10.225,
+      "dr_drift_x": 11.064,
+      "dr_drift_y": 2.841,
+      "imu": {
+        "ax": 0.32,
+        "ay": -0.348
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.553,
+          "true_distance": 10.567,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.506,
+          "true_distance": 10.422,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.832,
+          "true_distance": 5.0,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.397,
+          "true_distance": 5.296,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 53,
+      "time_s": 10.6,
+      "true_x": 6.327,
+      "true_y": 10.298,
+      "dr_drift_x": 11.413,
+      "dr_drift_y": 2.63,
+      "imu": {
+        "ax": 0.28,
+        "ay": -0.375
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.639,
+          "true_distance": 10.715,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.184,
+          "true_distance": 10.406,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.917,
+          "true_distance": 4.85,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.352,
+          "true_distance": 5.483,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 54,
+      "time_s": 10.8,
+      "true_x": 6.509,
+      "true_y": 10.359,
+      "dr_drift_x": 11.774,
+      "dr_drift_y": 2.405,
+      "imu": {
+        "ax": 0.275,
+        "ay": -0.362
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.78,
+          "true_distance": 10.86,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.271,
+          "true_distance": 10.381,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.893,
+          "true_distance": 4.692,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.785,
+          "true_distance": 5.675,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 55,
+      "time_s": 11.0,
+      "true_x": 6.699,
+      "true_y": 10.41,
+      "dr_drift_x": 12.14,
+      "dr_drift_y": 2.166,
+      "imu": {
+        "ax": 0.148,
+        "ay": -0.348
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.016,
+          "true_distance": 11.001,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.448,
+          "true_distance": 10.346,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.419,
+          "true_distance": 4.526,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 5.922,
+          "true_distance": 5.871,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 56,
+      "time_s": 11.2,
+      "true_x": 6.894,
+      "true_y": 10.449,
+      "dr_drift_x": 12.511,
+      "dr_drift_y": 1.908,
+      "imu": {
+        "ax": 0.113,
+        "ay": -0.465
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.049,
+          "true_distance": 11.137,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.257,
+          "true_distance": 10.303,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.35,
+          "true_distance": 4.354,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.021,
+          "true_distance": 6.07,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 57,
+      "time_s": 11.4,
+      "true_x": 7.094,
+      "true_y": 10.477,
+      "dr_drift_x": 12.886,
+      "dr_drift_y": 1.637,
+      "imu": {
+        "ax": 0.127,
+        "ay": -0.35
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.172,
+          "true_distance": 11.267,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.086,
+          "true_distance": 10.251,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 4.175,
+          "true_distance": 4.176,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.306,
+          "true_distance": 6.27,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 58,
+      "time_s": 11.6,
+      "true_x": 7.296,
+      "true_y": 10.494,
+      "dr_drift_x": 13.269,
+      "dr_drift_y": 1.353,
+      "imu": {
+        "ax": 0.159,
+        "ay": -0.292
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.341,
+          "true_distance": 11.392,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.337,
+          "true_distance": 10.191,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 3.845,
+          "true_distance": 3.994,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.401,
+          "true_distance": 6.471,
+          "is_nlos": false
+        }
+      ]
+    },
+    {
+      "step": 59,
+      "time_s": 11.8,
+      "true_x": 7.5,
+      "true_y": 10.5,
+      "dr_drift_x": 13.653,
+      "dr_drift_y": 1.059,
+      "imu": {
+        "ax": 0.048,
+        "ay": -0.274
+      },
+      "readings": [
+        {
+          "anchor_id": "A1",
+          "anchor_x": 1.0,
+          "anchor_y": 1.0,
+          "observed_distance": 11.419,
+          "true_distance": 11.511,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A2",
+          "anchor_x": 11.0,
+          "anchor_y": 1.0,
+          "observed_distance": 10.013,
+          "true_distance": 10.124,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A3",
+          "anchor_x": 11.0,
+          "anchor_y": 9.0,
+          "observed_distance": 3.804,
+          "true_distance": 3.808,
+          "is_nlos": false
+        },
+        {
+          "anchor_id": "A4",
+          "anchor_x": 1.0,
+          "anchor_y": 9.0,
+          "observed_distance": 6.705,
+          "true_distance": 6.671,
+          "is_nlos": false
+        }
+      ]
+    }
+  ]
+}
