@@ -6,5 +6,7 @@ node_modules/
 dist/
 .DS_Store
 *.log
+*.jsonl
+data/sessions/
 data/*.csv
 !data/.gitkeep
