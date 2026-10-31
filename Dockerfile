@@ -1,7 +1,7 @@
 # ==============================================================================
-# Multi-Stage Dockerfile for GhostTrack on Google Cloud Run
+# Multi-Stage Dockerfile for GhostTrack on Hugging Face Spaces
 # Stage 1: Build the React + Vite Dashboard
-# Stage 2: Minimal Python 3.11 image with PyTorch (CPU) & FastAPI Backend
+# Stage 2: Minimal Python 3.11 runtime with PyTorch (CPU) & FastAPI Backend
 # ==============================================================================
 
 # --- Stage 1: Build Frontend ---
@@ -20,7 +20,12 @@ FROM python:3.11-slim AS runner
 # Avoid Python buffering and .pyc generation
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8080
+    PORT=7860
+
+# Set up user for Hugging Face Spaces (runs under UID 1000)
+RUN useradd -m -u 1000 user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
 WORKDIR /app
 
@@ -49,8 +54,12 @@ COPY data/ ./data/
 # Copy compiled frontend from Stage 1 into frontend/dist
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Expose default Cloud Run port
-EXPOSE 8080
+# Set permissions for user 1000
+RUN chown -R user:user /app
+USER user
+
+# Hugging Face Spaces expects port 7860
+EXPOSE 7860
 
 # Run FastAPI backend with Uvicorn (WebSockets & SPA)
-CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1"]
+CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-7860} --workers 1"]

@@ -1,3 +1,13 @@
+---
+title: GhostTrack Resilient Indoor Positioning
+emoji: 🛰️
+colorFrom: cyan
+colorTo: emerald
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # InSight AI · GhostTrack — Resilient Indoor Positioning
 
 **Team**: Kajukatli (Diptanshu Jamar)  
