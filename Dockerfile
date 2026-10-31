@@ -20,6 +20,7 @@ FROM python:3.11-slim AS runner
 # Avoid Python buffering and .pyc generation
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
     PORT=7860
 
 # Set up user for Hugging Face Spaces (runs under UID 1000)
@@ -44,6 +45,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend Python codebase and assets
+COPY ghosttrack.py .
+COPY ghosttrack_model.pt .
 COPY backend/ ./backend/
 COPY engine/ ./engine/
 COPY model/ ./model/
